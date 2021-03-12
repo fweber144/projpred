@@ -303,7 +303,14 @@ bootstrap <- function(x, fun = mean, b = 1000, oobfun = NULL, seed = NULL,
                          wobs = rep(1, dim(mu)[1]),
                          wsample = rep(1, dim(mu)[2]), cl = NULL) {
   # Function for perfoming the clustering over the samples.
-  #
+
+  # For nominal or ordinal families, `mu` is a 3-dimensional array with the
+  # first dimension corresponding to the N observations, the second dimension
+  # corresponding to the K outcome categories, and the third dimension
+  # corresponding to the S posterior draws. In that case, the first and the
+  # second dimension are coerced to an augmented single dimension:
+  if (identical(length(dim(mu)), 3L)) mu <- apply(mu, 3, as.vector)
+
   # cluster the samples in the latent space if no clustering provided
   if (is.null(cl)) {
     f <- family$linkfun(mu)
