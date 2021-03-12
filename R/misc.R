@@ -304,16 +304,17 @@ bootstrap <- function(x, fun = mean, b = 1000, oobfun = NULL, seed = NULL,
                          wsample = rep(1, dim(mu)[2]), cl = NULL) {
   # Function for perfoming the clustering over the samples.
 
-  # For nominal or ordinal families, `mu` is a 3-dimensional array with the
-  # first dimension corresponding to the N observations, the second dimension
-  # corresponding to the K outcome categories, and the third dimension
-  # corresponding to the S posterior draws. In that case, the first and the
-  # second dimension are coerced to an augmented single dimension:
-  if (identical(length(dim(mu)), 3L)) mu <- apply(mu, 3, as.vector)
+  # Note: For nominal and ordinal families, `mu` is a 3-dimensional array
+  # containing the outcome probabilities, with the first dimension corresponding
+  # to the N observations, the second dimension corresponding to the K outcome
+  # categories, and the third dimension corresponding to the S posterior draws.
 
   # cluster the samples in the latent space if no clustering provided
   if (is.null(cl)) {
     f <- family$linkfun(mu)
+    # For nominal and ordinal families, the first and the second dimension of
+    # the returned array are coerced to an augmented single dimension:
+    if (identical(length(dim(f)), 3L)) f <- apply(f, 3, as.vector)
     out <- kmeans(t(f), nclusters, iter.max = 50)
     cl <- out$cluster # cluster indices for each sample
   } else if (typeof(cl) == "list") {
@@ -326,6 +327,10 @@ bootstrap <- function(x, fun = mean, b = 1000, oobfun = NULL, seed = NULL,
     }
     cl <- cl$cluster
   }
+
+  # For nominal and ordinal families, the first and the second dimension of `mu`
+  # are coerced to an augmented single dimension:
+  if (identical(length(dim(mu)), 3L)) mu <- apply(mu, 3, as.vector)
 
   # (re)compute the cluster centers, because they may be different from the ones
   # returned by kmeans if the samples have differing weights
