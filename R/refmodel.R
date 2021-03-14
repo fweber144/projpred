@@ -349,15 +349,15 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
 
       if (family(fit)$family == "cumulative") {
         # TODO: Incorporate the thresholds to yield a 3-dimensional array with
-        # dimensions S x N x K (see below for an explanation).
+        # dimensions S x N x \tilde{K} (see below for an explanation).
       }
       if (identical(length(dim(linpred_out)), 3L)) {
         # In this case, `linpred_out` is expected to be a 3-dimensional array
-        # with dimensions S x N x K, corresponding to posterior draws,
+        # with dimensions S x N x \tilde{K}, corresponding to posterior draws,
         # observations (of the original dataset), and outcome categories (or
         # their latent variants). Therefore, it is coerced to an augmented-rows
         # matrix with attribute `nobs_orig` which allows to convert it back to a
-        # 3-dimensional array with dimensions N x K x S (by the help of
+        # 3-dimensional array with dimensions N x \tilde{K} x S (by the help of
         # projpred:::augmat2arr()). For the definition of an "augmented-rows
         # matrix", see object `mu` further below.
         nobs_orig <- dim(linpred_out)[2]

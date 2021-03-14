@@ -587,7 +587,7 @@ get_as.matrix_cls_projpred <- function() {
 }
 
 # A function for converting an augmented-data matrix back to a 3-dimensional
-# array with dimensions N x K x S, corresponding to observations (of the
+# array with dimensions N x \tilde{K} x S, corresponding to observations (of the
 # original dataset), outcome categories (or their latent variants), and
 # posterior draws:
 augmat2arr <- function(augmat, nobs_orig = attr(augmat, "nobs_orig")) {
