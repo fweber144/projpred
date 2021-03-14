@@ -440,15 +440,14 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
 
   ## ref_predfun should already take into account the family of the model
   ## we leave this here just in case
-  # Note: For the augmented-data approach, in particular for nominal and
-  # ordinal families with more than 2 categories, the matrix `mu` must
-  # contain the outcome probabilities, with an augmented first dimension
-  # corresponding to the N observations nested in the K outcome categories
-  # (i.e. N * K rows in K blocks of N rows). For ordered outcome categories,
-  # the K outcome categories (blocks) have to be sorted in increasing order.
-  # (Note that just like for the non-augmented-data projpred code, the
-  # second dimension of `mu`, i.e. the columns, must still correspond to the S
-  # posterior draws.)
+  # Note: For the augmented-data approach, in particular for nominal and ordinal
+  # families with more than 2 categories, the matrix `mu` must contain the
+  # outcome probabilities, with an augmented first dimension corresponding to
+  # the N observations nested in the K outcome categories (i.e. N * K rows in K
+  # blocks of N rows). For ordered outcome categories, the K outcome categories
+  # (blocks) have to be sorted in increasing order. (Note that just like for the
+  # non-augmented-data projpred code, the second dimension of `mu`, i.e. the
+  # columns, must still correspond to the S posterior draws.)
   if (proper_model) {
     mu <- ref_predfun(object)
     mu <- unname(as.matrix(mu))
