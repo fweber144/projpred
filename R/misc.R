@@ -586,3 +586,17 @@ get_as.matrix_cls_projpred <- function() {
   return(as.matrix_cls_projpred)
 }
 
+# A function for converting an augmented-data matrix back to a 3-dimensional
+# array with dimensions N x K x S, corresponding to observations (of the
+# original dataset), outcome categories (or their latent variants), and
+# posterior draws:
+augmat2arr <- function(augmat, nobs_orig = attr(augmat, "nobs_orig")) {
+  # From ?is.integer:
+  is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) {
+    abs(x - round(x)) < tol
+  }
+  n_discr <- nrow(augmat) / nobs_orig
+  stopifnot(is.wholenumber(n_discr))
+  n_discr <- as.integer(round(n_discr))
+  return(array(augmat, dim = c(nobs_orig, n_discr, ncol(augmat))))
+}
