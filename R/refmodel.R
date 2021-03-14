@@ -345,7 +345,33 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
   response_name <- terms$response
   if (is.null(ref_predfun)) {
     ref_predfun <- function(fit, newdata = NULL) {
-      t(posterior_linpred(fit, transform = FALSE, newdata = newdata))
+      linpred_out <- posterior_linpred(fit, transform = FALSE, newdata = newdata)
+
+      if (family(fit)$family == "cumulative") {
+        # TODO: Incorporate the thresholds to yield a 3-dimensional array with
+        # dimensions S x N x K (see below for an explanation).
+      }
+      if (identical(length(dim(linpred_out)), 3L)) {
+        # In this case, `linpred_out` is expected to be a 3-dimensional array
+        # with dimensions S x N x K, corresponding to posterior draws,
+        # observations (of the original dataset), and outcome categories (or
+        # their latent variants). Therefore, it is coerced to an augmented-rows
+        # matrix with attribute `nobs_orig` which allows to convert it back to a
+        # 3-dimensional array with dimensions N x K x S (by the help of
+        # projpred:::augmat2arr()). For the definition of an "augmented-rows
+        # matrix", see object `mu` further below.
+        nobs_orig <- dim(linpred_out)[2]
+        linpred_out <- apply(linpred_out, 1, as.vector)
+        attr(linpred_out, "nobs_orig") <- nobs_orig
+        # TODO: Assign additional class, e.g. "augmat", to `linpred_out`? Then,
+        # one could use `inherits(x, "augmat")` for checking if a matrix is an
+        # augmented one. (Function augmat2arr() would then have to be defined as
+        # a method.)
+      } else {
+        linpred_out <- t(linpred_out)
+      }
+
+      return(linpred_out)
     }
   }
 
@@ -414,11 +440,21 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
 
   ## ref_predfun should already take into account the family of the model
   ## we leave this here just in case
+  # Note: For the augmented-data approach, in particular for nominal and
+  # ordinal families with more than 2 categories, the matrix `mu` must
+  # contain the outcome probabilities, with an augmented first dimension
+  # corresponding to the N observations nested in the K outcome categories
+  # (i.e. N * K rows in K blocks of N rows). For ordered outcome categories,
+  # the K outcome categories (blocks) have to be sorted in increasing order.
+  # (Note that just like for the non-augmented-data projpred code, the
+  # second dimension of `mu`, i.e. the columns, must still correspond to the S
+  # posterior draws.)
   if (proper_model) {
     mu <- ref_predfun(object)
     mu <- unname(as.matrix(mu))
     mu <- family$linkinv(mu)
   } else {
+    # TODO: Take augmented-data approach into account here, too?
     mu <- matrix(y / weights, NROW(y), 1)
     ref_predfun_datafit <- function(fit = NULL, newdata = NULL, offset = 0) {
       if (is.null(fit)) {
