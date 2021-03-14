@@ -351,7 +351,7 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
         # TODO: Incorporate the thresholds to yield a 3-dimensional array with
         # dimensions S x N x \tilde{K} (see below for an explanation).
       }
-      if (identical(length(dim(linpred_out)), 3L)) {
+      if (length(dim(linpred_out)) == 3) {
         # In this case, `linpred_out` is expected to be a 3-dimensional array
         # with dimensions S x N x \tilde{K}, corresponding to posterior draws,
         # observations (of the original dataset), and outcome categories (or
