@@ -41,7 +41,15 @@
 #' @param offset A vector of offsets per observation to add to the linear
 #'   predictor.
 #' @param dis A dispersion vector for each observation.
+#' @param aug_data A single logical value indicating whether to use the
+#'   augmented-data approach for projection (\code{TRUE}) or not (\code{FALSE}).
+#'   For more information, see section "Details" below.
 #' @param ... Arguments passed to the methods.
+#'
+#' @details As soon as possible, more information concerning the augmented-data
+#'   approach will be provided here. For now,
+#'   \href{https://github.com/stan-dev/projpred/issues/70}{this GitHub issue}
+#'   provides some basic information.
 #'
 #' @return An object of type \code{refmodel} (the same type as returned by
 #'   \link{init_refmodel}) that can be passed to all the functions that take the
@@ -338,7 +346,7 @@ get_refmodel.stanreg <- function(object, data = NULL, ref_predfun = NULL,
 init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
                           div_minimizer = NULL, proj_predfun = NULL,
                           folds = NULL, extract_model_data = NULL, cvfun = NULL,
-                          cvfits = NULL, dis = NULL, ...) {
+                          cvfits = NULL, dis = NULL, aug_data = FALSE, ...) {
   stopifnot(inherits(formula, "formula"))
   formula <- expand_formula(formula, data)
   terms <- extract_terms_response(formula)

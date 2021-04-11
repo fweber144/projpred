@@ -57,6 +57,7 @@ init_refmodel(
   cvfun = NULL,
   cvfits = NULL,
   dis = NULL,
+  aug_data = FALSE,
   ...
 )
 }
@@ -111,6 +112,10 @@ reference model fit, newdata is either NULL or a data frame with new
 observations, wrhs is a right hand side formula to recover the weights from
 the data frame and orhs is a right hand side formula to recover the offset
 from the data frame.}
+
+\item{aug_data}{A single logical value indicating whether to use the
+augmented-data approach for projection (\code{TRUE}) or not (\code{FALSE}).
+For more information, see section "Details" below.}
 }
 \value{
 An object of type \code{refmodel} (the same type as returned by
@@ -124,6 +129,12 @@ Generic function that can be used to create and fetch the reference model
 structure for all those objects that have this method. All these
 implementations are wrappers to the \code{\link{init_refmodel}}-function so
 the returned object has the same type.
+}
+\details{
+As soon as possible, more information concerning the augmented-data
+  approach will be provided here. For now,
+  \href{https://github.com/stan-dev/projpred/issues/70}{this GitHub issue}
+  provides some basic information.
 }
 \examples{
 \donttest{
