@@ -12,7 +12,7 @@
 #' @param data Data on which the reference model was fitted.
 #' @param formula Reference model's lme4-like formula.
 #' @param ref_predfun Prediction function for the linear predictor of the
-#'   reference model.
+#'   reference model. See section "Details" below.
 #' @param proj_predfun Prediction function for the linear predictor of the
 #'   projections.
 #' @param div_minimizer Maximum likelihood estimator for the underlying
@@ -47,9 +47,16 @@
 #' @param ... Arguments passed to the methods.
 #'
 #' @details As soon as possible, more information concerning the augmented-data
-#'   approach will be provided here. For now,
+#'   projection will be provided here. For now,
 #'   \href{https://github.com/stan-dev/projpred/issues/70}{this GitHub issue}
-#'   provides some basic information.
+#'   provides some basic information. Note that for the augmented-data
+#'   projection, \code{ref_predfun} has to return an "augmented-rows matrix",
+#'   i.e. a matrix with the rows corresponding to the N observations nested in
+#'   the K response categories (i.e. N * K rows in K blocks of N rows). For
+#'   ordered response categories, the K response categories (blocks) have to be
+#'   sorted in increasing order. The columns of an "augmented-rows" matrix have
+#'   to correspond to the S posterior draws, just like for the
+#'   non-augmented-data projection.
 #'
 #' @return An object of type \code{refmodel} (the same type as returned by
 #'   \link{init_refmodel}) that can be passed to all the functions that take the
@@ -361,12 +368,10 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
         # For the augmented-data projection, `linpred_out` is expected to be a
         # 3-dimensional array with dimensions S x N x \tilde{K}, corresponding
         # to posterior draws, observations (of the original dataset), and
-        # outcome categories (or their latent variants). Therefore, it is
+        # response categories (or their latent variants). Therefore, it is
         # coerced to an augmented-rows matrix with attribute `nobs_orig` which
         # allows to convert it back to a 3-dimensional array with dimensions N x
-        # \tilde{K} x S (by the help of projpred:::augmat2arr()). For the
-        # definition of an "augmented-rows matrix", see object `mu` further
-        # below.
+        # \tilde{K} x S (by the help of projpred:::augmat2arr()).
         nobs_orig <- dim(linpred_out)[2]
         linpred_out <- apply(linpred_out, 1, as.vector)
         attr(linpred_out, "nobs_orig") <- nobs_orig
@@ -443,14 +448,10 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
 
   ## ref_predfun should already take into account the family of the model
   ## we leave this here just in case
-  # Note: For the augmented-data approach, in particular for nominal and ordinal
-  # families with more than 2 categories, the matrix `mu` must contain the
-  # outcome probabilities, with an augmented first dimension corresponding to
-  # the N observations nested in the K outcome categories (i.e. N * K rows in K
-  # blocks of N rows). For ordered outcome categories, the K outcome categories
-  # (blocks) have to be sorted in increasing order. (Note that just like for the
-  # non-augmented-data projpred code, the second dimension of `mu`, i.e. the
-  # columns, must still correspond to the S posterior draws.)
+  # Note: For the augmented-data projection, in particular for nominal and
+  # ordinal families with more than 2 categories, the final matrix `mu` will be
+  # an augmented-rows matrix containing the probabilities for each of the
+  # response categories (at each observation and each posterior draw).
   if (proper_model) {
     mu <- ref_predfun(object)
     mu <- unname(as.matrix(mu))
