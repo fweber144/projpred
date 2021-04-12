@@ -353,27 +353,10 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
   response_name <- terms$response
   if (is.null(ref_predfun)) {
     ref_predfun <- function(fit, newdata = NULL) {
-      linpred_out <- posterior_linpred(fit, transform = FALSE, newdata = newdata)
+      linpred_out <- posterior_linpred(
+        fit, transform = FALSE, newdata = newdata
+      )
 
-      if (family(fit)$family == "cumulative") {
-        # Incorporate the thresholds to yield a 3-dimensional array with
-        # dimensions S x N x \tilde{K} (see below for an explanation of these
-        # dimensions):
-        if (inherits(fit, "brmsfit")) {
-          if (!requireNamespace("brms", quietly = TRUE)) {
-            stop("Package 'brms' needed. Please install it.")
-          }
-          bprep <- brms::prepare_predictions(fit)
-          linpred_out <- sapply(seq_len(ncol(linpred_out)), function(i) {
-            sweep(bprep$thres$thres, 1, as.array(linpred_out[, i])) # Short (but without recycling checks): `bprep$thres$thres - linpred_out[, i]`
-          }, simplify = "array")
-          linpred_out <- aperm(linpred_out, perm = c(1, 3, 2))
-        } else {
-          # TODO: Implement this for other fit object classes.
-          stop("When incorporating the thresholds into the linear predictors, ",
-               "this case still needs to be implemented.")
-        }
-      }
       if (length(dim(linpred_out)) == 3) {
         # In this case, `linpred_out` is expected to be a 3-dimensional array
         # with dimensions S x N x \tilde{K}, corresponding to posterior draws,
