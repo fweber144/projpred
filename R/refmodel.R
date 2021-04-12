@@ -370,10 +370,6 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
         nobs_orig <- dim(linpred_out)[2]
         linpred_out <- apply(linpred_out, 1, as.vector)
         attr(linpred_out, "nobs_orig") <- nobs_orig
-        # TODO: Assign additional class, e.g. "augmat", to `linpred_out`? Then,
-        # one could use `inherits(x, "augmat")` for checking if a matrix is an
-        # augmented one. (Function augmat2arr() would then have to be defined as
-        # a method.)
       } else {
         linpred_out <- t(linpred_out)
       }
@@ -460,7 +456,7 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
     mu <- unname(as.matrix(mu))
     mu <- family$linkinv(mu)
   } else {
-    # TODO: Take augmented-data approach into account here, too?
+    # TODO: Take augmented-data approach into account here, too.
     mu <- matrix(y / weights, NROW(y), 1)
     ref_predfun_datafit <- function(fit = NULL, newdata = NULL, offset = 0) {
       if (is.null(fit)) {
