@@ -454,6 +454,11 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
   if (proper_model) {
     mu <- ref_predfun(object)
     mu <- unname(as.matrix(mu))
+    if (aug_data && is.null(attr(mu, "nobs_orig"))) {
+      stop("The `ref_predfun` function seems to be inappropriate for the ",
+           "augmented-data projection. It has to return an augmented-rows ",
+           "matrix in that case.")
+    }
     mu <- family$linkinv(mu)
   } else {
     # TODO: Take augmented-data approach into account here, too.
