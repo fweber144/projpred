@@ -514,7 +514,8 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
   refmodel <- nlist(
     fit = object, formula, div_minimizer, family, mu, dis, y,
     loglik, intercept, proj_predfun, fetch_data = fetch_data_wrapper,
-    wobs = weights, wsample, offset, folds, cvfun, cvfits, extract_model_data
+    wobs = weights, wsample, offset, folds, cvfun, cvfits, extract_model_data,
+    aug_data
   )
   if (proper_model) {
     refmodel$ref_predfun <- ref_predfun
