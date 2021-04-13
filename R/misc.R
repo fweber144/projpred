@@ -114,6 +114,7 @@ bootstrap <- function(x, fun = mean, b = 1000, oobfun = NULL, seed = NULL,
 # from rstanarm
 `%ORifNULL%` <- function(a, b) if (is.null(a)) b else a
 
+# From `?is.integer` (slightly modified):
 .is.wholenumber <- function(x) abs(x - round(x)) < .Machine$double.eps^0.5
 
 .validate_num_folds <- function(k, n) {
