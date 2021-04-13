@@ -587,7 +587,17 @@ get_as.matrix_cls_projpred <- function() {
   return(as.matrix_cls_projpred)
 }
 
-# A function for converting an augmented-data matrix back to a 3-dimensional
+# A function for converting a 3-dimensional array with dimensions S x N x
+# \tilde{K} (corresponding to posterior draws, response categories (or their
+# latent variants), and observations (of the original dataset)) to an
+# augmented-rows matrix:
+permarr2augmat <- function(permarr) {
+  augmat <- apply(permarr, 1, as.vector)
+  attr(augmat, "nobs_orig") <- dim(permarr)[2]
+  return(augmat)
+}
+
+# A function for converting an augmented-rows matrix back to a 3-dimensional
 # array with dimensions N x \tilde{K} x S, corresponding to observations (of the
 # original dataset), response categories (or their latent variants), and
 # posterior draws:
