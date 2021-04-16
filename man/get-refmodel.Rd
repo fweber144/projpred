@@ -72,7 +72,7 @@ types below.}
 \item{formula}{Reference model's lme4-like formula.}
 
 \item{ref_predfun}{Prediction function for the linear predictor of the
-reference model.}
+reference model. See section "Details" below.}
 
 \item{proj_predfun}{Prediction function for the linear predictor of the
 projections.}
@@ -132,9 +132,16 @@ the returned object has the same type.
 }
 \details{
 As soon as possible, more information concerning the augmented-data
-  approach will be provided here. For now,
+  projection will be provided here. For now,
   \href{https://github.com/stan-dev/projpred/issues/70}{this GitHub issue}
-  provides some basic information.
+  provides some basic information. Note that for the augmented-data
+  projection, \code{ref_predfun} has to return an "augmented-rows matrix",
+  i.e. a matrix with the rows corresponding to the N observations nested in
+  the K response categories (i.e. N * K rows in K blocks of N rows). For
+  ordered response categories, the K response categories (blocks) have to be
+  sorted in increasing order. The columns of an "augmented-rows" matrix have
+  to correspond to the S posterior draws, just like for the
+  non-augmented-data projection.
 }
 \examples{
 \donttest{
