@@ -602,9 +602,15 @@ permarr2augmat <- function(permarr) {
 }
 
 # A function for converting an augmented-rows matrix back to a 3-dimensional
-# array with dimensions N x \tilde{K} x S, corresponding to observations (of the
-# original dataset), response categories (or their latent variants), and
-# posterior draws:
+# array with dimensions N x \tilde{K} x S.
+#
+# @param augmat An augmented-rows matrix (see `?init_refmodel` for a
+#   definition).
+# @param nobs_orig The number of observations in the original dataset.
+#
+# @return A 3-dimensional array with dimensions N x \tilde{K} x S (corresponding
+#   to observations (of the original dataset), response categories (or their
+#   latent variants), and posterior draws).
 augmat2arr <- function(augmat, nobs_orig = attr(augmat, "nobs_orig")) {
   stopifnot(!is.null(nobs_orig))
   n_discr <- nrow(augmat) / nobs_orig
