@@ -606,5 +606,8 @@ augmat2arr <- function(augmat, nobs_orig = attr(augmat, "nobs_orig")) {
   n_discr <- nrow(augmat) / nobs_orig
   stopifnot(.is.wholenumber(n_discr))
   n_discr <- as.integer(round(n_discr))
+  # The case `n_discr == 1L` would need special handling (especially when
+  # subsetting the returned array), so don't allow it (at least for now):
+  stopifnot(n_discr > 1L)
   return(array(augmat, dim = c(nobs_orig, n_discr, ncol(augmat))))
 }
