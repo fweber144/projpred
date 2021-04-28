@@ -587,17 +587,18 @@ get_as.matrix_cls_projpred <- function() {
   return(as.matrix_cls_projpred)
 }
 
-# A function for converting a 3-dimensional array with dimensions S x N x
-# \tilde{K} to an augmented-rows matrix.
+# A function for converting a 3-dimensional array with dimensions N x \tilde{K}
+# x S to an augmented-rows matrix.
 #
-# @param permarr A 3-dimensional array with dimensions S x N x \tilde{K}
-#   (corresponding to posterior draws, observations in the original (i.e.,
-#   non-augmented) dataset, and response categories (or their latent variants)).
+# @param arr A 3-dimensional array with dimensions N x \tilde{K} x S
+#   (corresponding to observations in the original (i.e., non-augmented)
+#   dataset, response categories (or their latent variants), and posterior
+#   draws).
 #
 # @return An augmented-rows matrix (see `?init_refmodel` for a definition).
-permarr2augmat <- function(permarr) {
-  augmat <- apply(permarr, 1, as.vector)
-  attr(augmat, "nobs_orig") <- dim(permarr)[2]
+arr2augmat <- function(arr) {
+  augmat <- apply(arr, 3, as.vector)
+  attr(augmat, "nobs_orig") <- dim(arr)[2]
   return(augmat)
 }
 
@@ -640,11 +641,11 @@ augmatapply <- function(augmat, MARGIN, FUN, ...) {
   # Currently, only `MARGIN = "obs"` is allowed:
   stopifnot(MARGIN %in% c("obs"))
   in_arr <- augmat2arr(augmat)
-  out_permarr <- aperm(
+  out_arr <- aperm(
     sapply(seq_len(dim(in_arr)[1]), function(i) {
-      FUN(t(in_arr[i, , ]), ...)
+      FUN(in_arr[i, , ], ...)
     }, simplify = "array"),
-    perm = c(1, 3, 2)
+    perm = c(3, 1, 2)
   )
-  permarr2augmat(out_permarr)
+  arr2augmat(out_arr)
 }

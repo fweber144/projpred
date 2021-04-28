@@ -373,7 +373,7 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
         # `nobs_orig` which allows to convert it back to a 3-dimensional array
         # with dimensions N x \tilde{K} x S (by the help of
         # projpred:::augmat2arr()):
-        linpred_out <- permarr2augmat(linpred_out)
+        linpred_out <- arr2augmat(aperm(linpred_out, perm = c(2, 3, 1)))
       } else {
         linpred_out <- t(linpred_out)
       }
