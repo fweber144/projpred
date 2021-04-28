@@ -611,3 +611,28 @@ augmat2arr <- function(augmat, nobs_orig = attr(augmat, "nobs_orig")) {
   stopifnot(n_discr > 1L)
   return(array(augmat, dim = c(nobs_orig, n_discr, ncol(augmat))))
 }
+
+# An apply()-like function for applying a user-specified function to a
+# "margin" of an augmented-rows matrix.
+#
+# @param augmat An augmented-rows matrix (see `?init_refmodel` for a
+#   definition).
+# @param MARGIN The "margin" to which apply `FUN`. Currently, only `"obs"` is
+#   supported and this means to apply `FUN` to the first dimension of the array
+#   returned by `augmat2arr(augmat)`.
+# @param FUN The function to apply to the "margin" `MARGIN` of `augmat`.
+#
+# @return An augmented-rows matrix containing the results from applying `FUN` to
+#   the "margin" `MARGIN` of `augmat`.
+augmatapply <- function(augmat, MARGIN, FUN, ...) {
+  # Currently, only `MARGIN = "obs"` is allowed:
+  stopifnot(MARGIN %in% c("obs"))
+  in_arr <- augmat2arr(augmat)
+  out_permarr <- aperm(
+    sapply(seq_len(dim(in_arr)[1]), function(i) {
+      FUN(t(in_arr[i, , ]), ...)
+    }, simplify = "array"),
+    perm = c(1, 3, 2)
+  )
+  permarr2augmat(out_permarr)
+}
