@@ -588,8 +588,8 @@ get_as.matrix_cls_projpred <- function() {
 }
 
 # A function for converting a 3-dimensional array with dimensions S x N x
-# \tilde{K} (corresponding to posterior draws, response categories (or their
-# latent variants), and observations (of the original dataset)) to an
+# \tilde{K} (corresponding to posterior draws, observations (of the original
+# dataset), and response categories (or their latent variants)) to an
 # augmented-rows matrix:
 permarr2augmat <- function(permarr) {
   augmat <- apply(permarr, 1, as.vector)
