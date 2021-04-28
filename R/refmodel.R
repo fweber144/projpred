@@ -367,11 +367,12 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
       if (length(dim(linpred_out)) == 3) {
         # For the augmented-data projection, `linpred_out` is expected to be a
         # 3-dimensional array with dimensions S x N x \tilde{K}, corresponding
-        # to posterior draws, observations (of the original dataset), and
-        # response categories (or their latent variants). Therefore, it is
-        # converted to an augmented-rows matrix with attribute `nobs_orig` which
-        # allows to convert it back to a 3-dimensional array with dimensions N x
-        # \tilde{K} x S (by the help of projpred:::augmat2arr()):
+        # to posterior draws, observations in the original (i.e., non-augmented)
+        # dataset, and response categories (or their latent variants).
+        # Therefore, it is converted to an augmented-rows matrix with attribute
+        # `nobs_orig` which allows to convert it back to a 3-dimensional array
+        # with dimensions N x \tilde{K} x S (by the help of
+        # projpred:::augmat2arr()):
         linpred_out <- permarr2augmat(linpred_out)
       } else {
         linpred_out <- t(linpred_out)
