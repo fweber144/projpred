@@ -591,8 +591,8 @@ get_as.matrix_cls_projpred <- function() {
 # \tilde{K} to an augmented-rows matrix.
 #
 # @param permarr A 3-dimensional array with dimensions S x N x \tilde{K}
-#   (corresponding to posterior draws, observations (of the original dataset),
-#   and response categories (or their latent variants)).
+#   (corresponding to posterior draws, observations in the original (i.e.,
+#   non-augmented) dataset, and response categories (or their latent variants)).
 #
 # @return An augmented-rows matrix (see `?init_refmodel` for a definition).
 permarr2augmat <- function(permarr) {
@@ -606,11 +606,12 @@ permarr2augmat <- function(permarr) {
 #
 # @param augmat An augmented-rows matrix (see `?init_refmodel` for a
 #   definition).
-# @param nobs_orig The number of observations in the original dataset.
+# @param nobs_orig The number of observations in the original (i.e.,
+#   non-augmented) dataset.
 #
 # @return A 3-dimensional array with dimensions N x \tilde{K} x S (corresponding
-#   to observations (of the original dataset), response categories (or their
-#   latent variants), and posterior draws).
+#   to observations in the original (i.e., non-augmented) dataset, response
+#   categories (or their latent variants), and posterior draws).
 augmat2arr <- function(augmat, nobs_orig = attr(augmat, "nobs_orig")) {
   stopifnot(!is.null(nobs_orig))
   n_discr <- nrow(augmat) / nobs_orig
