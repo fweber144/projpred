@@ -587,18 +587,31 @@ get_as.matrix_cls_projpred <- function() {
   return(as.matrix_cls_projpred)
 }
 
-# A function for converting a 3-dimensional array with dimensions N x \tilde{K}
-# x S to an augmented-rows matrix.
+# A function for converting a 3-dimensional array to an augmented-rows matrix.
 #
 # @param arr A 3-dimensional array with dimensions N x \tilde{K} x S
 #   (corresponding to observations in the original (i.e., non-augmented)
 #   dataset, response categories (or their latent variants), and posterior
-#   draws).
+#   draws) or S x N x \tilde{K}, depending on `margin_draws`.
+# @param margin_draws The index of `arr`'s margin which corresponds to the
+#   posterior draws (i.e., the margin of length S). Restricted to values `1` and
+#   `3`.
 #
 # @return An augmented-rows matrix (see `?init_refmodel` for a definition).
-arr2augmat <- function(arr) {
-  augmat <- apply(arr, 3, as.vector)
-  attr(augmat, "nobs_orig") <- dim(arr)[1]
+arr2augmat <- function(arr, margin_draws = 3) {
+  stopifnot(margin_draws %in% c(1, 3))
+  augmat <- apply(arr, margin_draws, as.vector)
+  ### Option 1 (clearer):
+  # if (margin_draws == 1) {
+  #   margin_obs <- 2
+  # } else if (margin_draws == 3) {
+  #   margin_obs <- 1
+  # }
+  ###
+  ### Option 2 (shorter):
+  margin_obs <- switch(margin_draws, 2, NA, 1)
+  ###
+  attr(augmat, "nobs_orig") <- dim(arr)[margin_obs]
   return(augmat)
 }
 
