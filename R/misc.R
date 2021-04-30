@@ -598,7 +598,7 @@ get_as.matrix_cls_projpred <- function() {
 # @return An augmented-rows matrix (see `?init_refmodel` for a definition).
 arr2augmat <- function(arr) {
   augmat <- apply(arr, 3, as.vector)
-  attr(augmat, "nobs_orig") <- dim(arr)[2]
+  attr(augmat, "nobs_orig") <- dim(arr)[1]
   return(augmat)
 }
 
