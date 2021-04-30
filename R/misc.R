@@ -643,7 +643,7 @@ augmatapply <- function(augmat, MARGIN, FUN, ...) {
   in_arr <- augmat2arr(augmat)
   out_arr <- aperm(
     sapply(seq_len(dim(in_arr)[1]), function(i) {
-      FUN(in_arr[i, , ], ...)
+      FUN(in_arr[i, , ], ...) # apply() would use `forceAndCall(1, FUN, in_arr[i, , ], ...)`.
     }, simplify = "array"),
     perm = c(3, 1, 2)
   )
