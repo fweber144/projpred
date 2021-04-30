@@ -650,7 +650,7 @@ augmat2arr <- function(augmat, nobs_orig = attr(augmat, "nobs_orig")) {
 #
 # @return An augmented-rows matrix containing the results from applying `FUN` to
 #   the "margin" `MARGIN` of `augmat`.
-augmatapply <- function(augmat, MARGIN, FUN, ...) {
+augmatapply <- function(augmat, MARGIN = "obs", FUN, ...) {
   # Currently, only `MARGIN = "obs"` is allowed:
   stopifnot(MARGIN %in% c("obs"))
   in_arr <- augmat2arr(augmat)
