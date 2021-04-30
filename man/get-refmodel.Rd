@@ -134,14 +134,25 @@ the returned object has the same type.
 As soon as possible, more information concerning the augmented-data
   projection will be provided here. For now,
   \href{https://github.com/stan-dev/projpred/issues/70}{this GitHub issue}
-  provides some basic information. Note that for the augmented-data
-  projection, \code{ref_predfun} has to return an "augmented-rows matrix",
-  i.e. a matrix with the rows corresponding to the N observations nested in
-  the K response categories (i.e. N * K rows in K blocks of N rows). For
-  ordered response categories, the K response categories (blocks) have to be
-  sorted in increasing order. The columns of an "augmented-rows" matrix have
-  to correspond to the S posterior draws, just like for the
-  non-augmented-data projection.
+  provides some basic information. For the augmented-data projection,
+  \code{ref_predfun} has to return an \emph{augmented-rows matrix}. For the
+  definition of an augmented-rows matrix, let \eqn{N} denote the number of
+  observations (in the original---i.e., non-augmented---dataset). Let
+  \eqn{C_{\mbox{cat}}}{C_cat} denote the number of response categories. Let
+  \eqn{C_{\mbox{lat}}}{C_lat} denote the number of latent response categories
+  (which typically equals \eqn{C_{\mbox{cat}} - 1}{C_cat - 1}). Let \eqn{C}
+  denote either \eqn{C_{\mbox{cat}}}{C_cat} or \eqn{C_{\mbox{lat}}}{C_lat},
+  whichever is appropriate in the context where it is used (e.g., for
+  \code{ref_predfun}'s output, \eqn{C = C_{\mbox{lat}}}{C = C_lat}). Then an
+  augmented-rows matrix is a matrix with \eqn{N \cdot C}{N x C} rows in
+  \eqn{C} blocks of \eqn{N} rows, i.e., with the \eqn{N} observations nested
+  in the \eqn{C} (latent) response categories. For ordered response
+  categories, the \eqn{C} (latent) response categories (i.e., the row blocks)
+  have to be sorted in increasing order (according to the ordered response).
+  The columns of an augmented-rows matrix have to correspond to the \eqn{S}
+  posterior draws, just like for the non-augmented-data projection. An
+  augmented-rows matrix needs to have \eqn{N} stored in an attribute called
+  \code{nobs_orig}.
 }
 \examples{
 \donttest{

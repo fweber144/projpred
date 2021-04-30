@@ -589,10 +589,9 @@ get_as.matrix_cls_projpred <- function() {
 
 # A function for converting a 3-dimensional array to an augmented-rows matrix.
 #
-# @param arr A 3-dimensional array with dimensions N x \tilde{K} x S
-#   (corresponding to observations in the original (i.e., non-augmented)
-#   dataset, response categories (or their latent variants), and posterior
-#   draws) or S x N x \tilde{K}, depending on `margin_draws`.
+# @param arr If `margin_draws` is `3`, a 3-dimensional array with dimensions
+#   N x C x S. If `margin_draws` is `1`, a 3-dimensional array with dimensions
+#   S x N x C. See `?init_refmodel` for a definition of these dimensions.
 # @param margin_draws The index of `arr`'s margin which corresponds to the
 #   posterior draws (i.e., the margin of length S). Restricted to values `1` and
 #   `3`.
@@ -615,17 +614,15 @@ arr2augmat <- function(arr, margin_draws = 3) {
   return(augmat)
 }
 
-# A function for converting an augmented-rows matrix back to a 3-dimensional
-# array with dimensions N x \tilde{K} x S.
+# A function for converting an augmented-rows matrix (see `?init_refmodel` for a
+# definition) to a 3-dimensional array with dimensions N x C x S (see
+# `?init_refmodel` for a definition of these dimensions).
 #
-# @param augmat An augmented-rows matrix (see `?init_refmodel` for a
-#   definition).
-# @param nobs_orig The number of observations in the original (i.e.,
-#   non-augmented) dataset.
+# @param augmat An augmented-rows matrix.
+# @param nobs_orig The number of observations (N). Usually should not have to be
+#   specified manually (i.e., the default should always work).
 #
-# @return A 3-dimensional array with dimensions N x \tilde{K} x S (corresponding
-#   to observations in the original (i.e., non-augmented) dataset, response
-#   categories (or their latent variants), and posterior draws).
+# @return A 3-dimensional array with dimensions N x C x S.
 augmat2arr <- function(augmat, nobs_orig = attr(augmat, "nobs_orig")) {
   stopifnot(!is.null(nobs_orig))
   n_discr <- nrow(augmat) / nobs_orig
@@ -643,14 +640,11 @@ augmat2arr <- function(augmat, nobs_orig = attr(augmat, "nobs_orig")) {
 # @param augmat An augmented-rows matrix (see `?init_refmodel` for a
 #   definition).
 # @param MARGIN The "margin" to which apply `FUN`. Currently, only `"obs"` is
-#   supported and this means to apply `FUN` to the first dimension
-#   (corresponding to the observations in the original (i.e., non-augmented)
-#   dataset) of the array returned by `augmat2arr(augmat)`.
+#   supported and this means to apply `FUN` to the first dimension (of length N)
+#   of the array returned by `augmat2arr(augmat)`.
 # @param FUN The function to apply to the "margin" `MARGIN` of `augmat`. This
 #   function has to return an object of the same kind as its first argument
-#   (i.e., a matrix of dimensions \tilde{K} x S for `MARGIN = "obs"`, but note
-#   that from input to output, \tilde{K} may switch to K or the other way
-#   round).
+#   (i.e., a matrix of dimensions C x S for `MARGIN = "obs"`).
 #
 # @return An augmented-rows matrix containing the results from applying `FUN` to
 #   the "margin" `MARGIN` of `augmat`.
