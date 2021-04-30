@@ -646,7 +646,11 @@ augmat2arr <- function(augmat, nobs_orig = attr(augmat, "nobs_orig")) {
 #   supported and this means to apply `FUN` to the first dimension
 #   (corresponding to the observations in the original (i.e., non-augmented)
 #   dataset) of the array returned by `augmat2arr(augmat)`.
-# @param FUN The function to apply to the "margin" `MARGIN` of `augmat`.
+# @param FUN The function to apply to the "margin" `MARGIN` of `augmat`. This
+#   function has to return an object of the same kind as its first argument
+#   (i.e., a matrix of dimensions \tilde{K} x S for `MARGIN = "obs"`, but note
+#   that from input to output, \tilde{K} may switch to K or the other way
+#   round).
 #
 # @return An augmented-rows matrix containing the results from applying `FUN` to
 #   the "margin" `MARGIN` of `augmat`.
