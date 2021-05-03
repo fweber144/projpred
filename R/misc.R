@@ -641,23 +641,41 @@ augmat2arr <- function(augmat, nobs_orig = attr(augmat, "nobs_orig")) {
 #   definition).
 # @param MARGIN The "margin" to which apply `FUN`. Currently, only `"obs"` is
 #   supported and this means to apply `FUN` to the first dimension (of length N)
-#   of the array returned by `augmat2arr(augmat)`.
+#   of the array returned by `augmat2arr(augmat)`, possibly after transposing
+#   `FUN`'s input matrix (see argument `margin_draws_FUN`).
 # @param FUN The function to apply to the "margin" `MARGIN` of `augmat`. This
 #   function has to return an object of the same kind as its first argument
-#   (i.e., a matrix of dimensions C x S for `MARGIN = "obs"`).
+#   (i.e., for `MARGIN = "obs"`, a matrix of dimensions C x S (in case of
+#   `margin_draws_FUN = 2`) or S x C (in case of `margin_draws_FUN = 1`)).
 # @param ... Arguments passed to `FUN`.
+# @param margin_draws_FUN The margin of `FUN`'s first argument (and also `FUN`'s
+#   output matrix) which corresponds to the posterior draws, i.e. that margin
+#   which is of length S. If `margin_draws_FUN = 1`, then `FUN`'s input matrix
+#   is transposed prior to be used by `FUN` (and `FUN`'s output is also handled
+#   appropriately).
 #
 # @return An augmented-rows matrix containing the results from applying `FUN` to
-#   the "margin" `MARGIN` of `augmat`.
-augmatapply <- function(augmat, MARGIN = "obs", FUN, ...) {
-  # Currently, only `MARGIN = "obs"` is allowed:
+#   the "margin" `MARGIN` of `augmat`, possibly after transposing `FUN`'s input
+#   matrix.
+augmatapply <- function(augmat, MARGIN = "obs", FUN, ...,
+                        margin_draws_FUN = 2) {
   stopifnot(MARGIN %in% c("obs"))
+  stopifnot(margin_draws_FUN %in% c(1, 2))
   in_arr <- augmat2arr(augmat)
-  out_arr <- aperm(
-    sapply(seq_len(dim(in_arr)[1]), function(i) {
+  if (margin_draws_FUN == 1) {
+    FUN_i <- function(i) {
+      FUN(t(in_arr[i, , ]), ...) # apply() would use `forceAndCall(1, FUN, t(in_arr[i, , ]), ...)`.
+    }
+    perm_vec <- c(1, 3, 2)
+  } else if (margin_draws_FUN == 2) {
+    FUN_i <- function(i) {
       FUN(in_arr[i, , ], ...) # apply() would use `forceAndCall(1, FUN, in_arr[i, , ], ...)`.
-    }, simplify = "array"),
-    perm = c(3, 1, 2)
+    }
+    perm_vec <- c(3, 1, 2)
+  }
+  out_arr <- aperm(
+    sapply(seq_len(dim(in_arr)[1]), FUN_i, simplify = "array"),
+    perm = perm_vec
   )
   arr2augmat(out_arr)
 }
