@@ -645,6 +645,7 @@ augmat2arr <- function(augmat, nobs_orig = attr(augmat, "nobs_orig")) {
 # @param FUN The function to apply to the "margin" `MARGIN` of `augmat`. This
 #   function has to return an object of the same kind as its first argument
 #   (i.e., a matrix of dimensions C x S for `MARGIN = "obs"`).
+# @param ... Arguments passed to `FUN`.
 #
 # @return An augmented-rows matrix containing the results from applying `FUN` to
 #   the "margin" `MARGIN` of `augmat`.
