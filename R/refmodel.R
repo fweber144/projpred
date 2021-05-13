@@ -374,7 +374,6 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
       linpred_out <- posterior_linpred(
         fit, transform = FALSE, newdata = newdata
       )
-
       if (length(dim(linpred_out)) == 3) {
         # For the augmented-data projection, `linpred_out` is expected to be a
         # 3-dimensional array with dimensions S x N x C (see `?init_refmodel`
@@ -385,7 +384,6 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
       } else {
         linpred_out <- t(linpred_out)
       }
-
       return(linpred_out)
     }
   }
