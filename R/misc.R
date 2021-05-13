@@ -621,15 +621,27 @@ arr2augmat <- function(arr, margin_draws = 3) {
 # @param augmat An augmented-rows matrix.
 # @param nobs_orig The number of observations (N). Usually should not have to be
 #   specified manually (i.e., the default should always work).
+# @param margin_draws The index of the returned array's margin which shall
+#   correspond to the posterior draws (i.e., the margin which shall be of
+#   length S). Restricted to values `1` and `3`.
 #
-# @return A 3-dimensional array with dimensions N x C x S.
-augmat2arr <- function(augmat, nobs_orig = attr(augmat, "nobs_orig")) {
+# @return If `margin_draws` is `3`, a 3-dimensional array with dimensions
+#   N x C x S. If `margin_draws` is `1`, a 3-dimensional array with dimensions
+#   S x N x C.
+augmat2arr <- function(augmat,
+                       nobs_orig = attr(augmat, "nobs_orig"),
+                       margin_draws = 3) {
   stopifnot(!is.null(nobs_orig))
+  stopifnot(margin_draws %in% c(1, 3))
   n_discr <- nrow(augmat) / nobs_orig
   stopifnot(.is.wholenumber(n_discr))
   n_discr <- as.integer(round(n_discr))
   # The case `n_discr == 1L` would need special handling (especially when
   # subsetting the returned array), so don't allow it (at least for now):
   stopifnot(n_discr > 1L)
-  return(array(augmat, dim = c(nobs_orig, n_discr, ncol(augmat))))
+  arr <- array(augmat, dim = c(nobs_orig, n_discr, ncol(augmat)))
+  if (margin_draws == 1) {
+    arr <- aperm(arr, perm = c(3, 1, 2))
+  }
+  return(arr)
 }
