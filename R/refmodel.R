@@ -461,7 +461,7 @@ init_refmodel <- function(object, data, formula, family, ref_predfun = NULL,
   if (proper_model) {
     mu <- ref_predfun(object)
     mu <- unname(as.matrix(mu))
-    if (aug_data && is.null(attr(mu, "nobs_orig"))) {
+    if (aug_data && !inherits(mu, "augmat")) {
       stop("The `ref_predfun` function seems to be inappropriate for the ",
            "augmented-data projection. It has to return an augmented-rows ",
            "matrix in that case.")
