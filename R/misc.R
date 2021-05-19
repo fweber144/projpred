@@ -611,6 +611,7 @@ arr2augmat <- function(arr, margin_draws = 3) {
   margin_obs <- switch(margin_draws, 2, NA, 1)
   ###
   attr(augmat, "nobs_orig") <- dim(arr)[margin_obs]
+  class(augmat) <- c("augmat", class(augmat))
   return(augmat)
 }
 
@@ -631,6 +632,7 @@ arr2augmat <- function(arr, margin_draws = 3) {
 augmat2arr <- function(augmat,
                        nobs_orig = attr(augmat, "nobs_orig"),
                        margin_draws = 3) {
+  stopifnot(inherits(augmat, "augmat"))
   stopifnot(!is.null(nobs_orig))
   stopifnot(margin_draws %in% c(1, 3))
   n_discr <- nrow(augmat) / nobs_orig
@@ -644,4 +646,16 @@ augmat2arr <- function(augmat,
     arr <- aperm(arr, perm = c(3, 1, 2))
   }
   return(arr)
+}
+
+# A method for subsetting an object of class "augmat" (mainly following
+# `[.factor`). This method keeps the "nobs_orig" attribute (as well as the
+# class).
+#' @keywords internal
+#' @export
+`[.augmat` <- function (x, ..., drop = TRUE) {
+  y <- NextMethod("[")
+  attr(y, "nobs_orig") <- attr(x, "nobs_orig")
+  class(y) <- oldClass(x)
+  return(y)
 }
