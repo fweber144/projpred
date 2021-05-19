@@ -66,8 +66,9 @@
 #'   have to be sorted in increasing order (according to the ordered response).
 #'   The columns of an augmented-rows matrix have to correspond to the \eqn{S}
 #'   posterior draws, just like for the non-augmented-data projection. An
-#'   augmented-rows matrix needs to have \eqn{N} stored in an attribute called
-#'   \code{nobs_orig}.
+#'   augmented-rows matrix is of class \code{"augmat"} (inheriting from classes
+#'   \code{"matrix"} and \code{"array"}) and needs to have the value of \eqn{N}
+#'   stored in an attribute called \code{"nobs_orig"}.
 #'
 #' @return An object of type \code{refmodel} (the same type as returned by
 #'   \link{init_refmodel}) that can be passed to all the functions that take the
