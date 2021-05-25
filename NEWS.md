@@ -15,6 +15,7 @@
 * Minor documentation improvements.
 * Minor improvements of error messages.
 * For K-fold cross-validation, an internally hard-coded value of 5 for `nclusters_pred` was removed. (GitHub: commit 5062f2ff6f981ab0e4be06b9aaf694dcaa27afa8)
+* Minor improvements in the vignettes. (GitHub: #<INSERT_PR_NUMBER_FOR_UPD_VIGNETTES>)
 
 ### Bug fixes
 
