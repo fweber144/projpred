@@ -37,17 +37,17 @@
 #'   only.
 #' @param integrated If \code{TRUE}, the output is averaged over the projected
 #'   posterior draws. Default is \code{FALSE}. For \code{proj_linpred} only.
-#' @param size_sub For \code{proj_predict} only: Number of draws to return from
-#'   the predictive distribution of the projection. Not to be confused with
-#'   arguments \code{ndraws} and \code{nclusters} of \link{project}:
-#'   \code{size_sub} gives a \emph{subset} of the (possibly clustered) posterior
-#'   draws after projection (as determined by arguments \code{ndraws} and
-#'   \code{nclusters} of \link{project}). The default for \code{size_sub} is
-#'   1000. We compute as many clusters from the reference posterior as draws, so
-#'   we end up projecting a single draw from each cluster.
-#' @param seed_sub For \code{proj_predict} only: An optional seed for subsetting
-#'   the (possibly clustered) posterior draws after projection (see argument
-#'   \code{size_sub}).
+#' @param nclusters_resample For \code{proj_predict} with clustered projection
+#'   only: Number of draws to return from the predictive distribution of the
+#'   projection. Not to be confused with argument \code{nclusters} of
+#'   \link{project}: \code{nclusters_resample} gives the number of draws
+#'   (\emph{with} replacement) from the set of clustered posterior draws after
+#'   projection (as determined by argument \code{nclusters} of \link{project}).
+#' @param seed_ppd For \code{proj_predict} only: An optional seed for drawing
+#'   from the posterior predictive distribution. If a clustered projection was
+#'   performed, \code{seed_ppd} is also used for drawing from the set of
+#'   clustered posterior draws after projection (see argument
+#'   \code{nclusters_resample}).
 #' @param ... Additional arguments passed to \link{project} if \code{object} is
 #'   not already an object returned by \link{project}.
 #'
@@ -99,7 +99,7 @@ NULL
 proj_helper <- function(object, filter_nterms = NULL, newdata,
                         offsetnew, weightsnew,
                         onesub_fun, integrated = NULL, transform = NULL,
-                        size_sub = NULL, ...) {
+                        nclusters_resample = NULL, ...) {
   if (inherits(object, "projection") ||
       (length(object) > 0 && inherits(object[[1]], "projection"))) {
     if (!is.null(filter_nterms)) {
@@ -170,7 +170,7 @@ proj_helper <- function(object, filter_nterms = NULL, newdata,
     onesub_fun(proj, mu, weightsnew,
                offset = offsetnew, newdata = newdata,
                integrated = integrated, transform = transform,
-               size_sub = size_sub)
+               nclusters_resample = nclusters_resample)
   })
 
   return(.unlist_proj(preds))
@@ -246,30 +246,36 @@ compute_lpd <- function(ynew, pred, proj, weights, integrated = FALSE,
 #' @rdname proj-pred
 #' @export
 proj_predict <- function(object, filter_nterms = NULL, newdata = NULL,
-                         offsetnew = NULL, weightsnew = NULL, size_sub = 1000,
-                         seed_sub = NULL, ...) {
+                         offsetnew = NULL, weightsnew = NULL,
+                         nclusters_resample = 1000,
+                         seed_ppd = NULL, ...) {
   ## set random seed but ensure the old RNG state is restored on exit
   rng_state_old <- rngtools::RNGseed()
   on.exit(rngtools::RNGseed(rng_state_old))
-  set.seed(seed_sub)
+  set.seed(seed_ppd)
 
   ## proj_helper lapplies fun to each projection in object
   proj_helper(
     object = object, filter_nterms = filter_nterms, newdata = newdata,
     offsetnew = offsetnew, weightsnew = weightsnew,
     onesub_fun = proj_predict_aux,
-    size_sub = size_sub, ...
+    nclusters_resample = nclusters_resample, ...
   )
 }
 
 ## function applied to each projected submodel in case of proj_predict()
 proj_predict_aux <- function(proj, mu, weights, ...) {
   dot_args <- list(...)
-  stopifnot(!is.null(dot_args$size_sub))
-  draw_inds <- sample(
-    x = seq_along(proj$weights), size = dot_args$size_sub,
-    replace = TRUE, prob = proj$weights
-  )
+  if (proj$p_type) {
+    # In this case, the posterior draws have been clustered.
+    stopifnot(!is.null(dot_args$nclusters_resample))
+    draw_inds <- sample(
+      x = seq_along(proj$weights), size = dot_args$nclusters_resample,
+      replace = TRUE, prob = proj$weights
+    )
+  } else {
+    draw_inds <- seq_along(proj$weights)
+  }
 
   do.call(rbind, lapply(draw_inds, function(i) {
     proj$family$ppd(mu[, i], proj$dis[i], weights)
@@ -787,35 +793,47 @@ replace_population_names <- function(population_effects) {
 }
 
 #' @method coef subfit
-coef.subfit <- function(x, ...) {
-  variables <- colnames(x$x)
-  coefs <- with(x, rbind(alpha, beta))
-  named_coefs <- setNames(coefs, variables)
-  return(named_coefs)
+#' @keywords internal
+#' @export
+coef.subfit <- function(object, ...) {
+  return(with(object, c(
+    "Intercept" = alpha,
+    setNames(beta, colnames(x))
+  )))
 }
 
 #' @method as.matrix lm
+#' @keywords internal
+#' @export
 as.matrix.lm <- function(x, ...) {
   return(coef(x) %>%
            replace_population_names())
 }
 
 #' @method as.matrix ridgelm
+#' @keywords internal
+#' @export
 as.matrix.ridgelm <- function(x, ...) {
   return(as.matrix.lm(x))
 }
 
 #' @method as.matrix subfit
+#' @keywords internal
+#' @export
 as.matrix.subfit <- function(x, ...) {
-  return(as.matrix.lm(x))
+  return(as.matrix.lm(x, ...))
 }
 
 #' @method as.matrix glm
+#' @keywords internal
+#' @export
 as.matrix.glm <- function(x, ...) {
-  return(as.matrix.lm(x))
+  return(as.matrix.lm(x, ...))
 }
 
 #' @method as.matrix lmerMod
+#' @keywords internal
+#' @export
 as.matrix.lmerMod <- function(x, ...) {
   population_effects <- lme4::fixef(x) %>%
     replace_population_names()
@@ -933,37 +951,57 @@ as.matrix.lmerMod <- function(x, ...) {
   return(c(population_effects, group_vc, group_ef))
 }
 
-#' @method as.matrix noquote
-as.matrix.noquote <- function(x, ...) {
-  return(coef(x))
+#' @method as.matrix glmerMod
+#' @keywords internal
+#' @export
+as.matrix.glmerMod <- function(x, ...) {
+  return(as.matrix.lmerMod(x, ...))
+}
+
+#' @method as.matrix gamm4
+#' @keywords internal
+#' @export
+as.matrix.gamm4 <- function(x, ...) {
+  return(as.matrix.lm(x, ...))
 }
 
 #' @method as.matrix list
+#' @keywords internal
+#' @export
 as.matrix.list <- function(x, ...) {
-  return(do.call(cbind, lapply(x, as.matrix.glm)))
+  return(do.call(cbind, lapply(x, as.matrix.glm, ...)))
 }
 
 #' @method t glm
+#' @keywords internal
+#' @export
 t.glm <- function(x, ...) {
-  return(t(as.matrix(x)))
+  return(t(as.matrix(x), ...))
 }
 
 #' @method t lm
+#' @keywords internal
+#' @export
 t.lm <- function(x, ...) {
-  return(t(as.matrix(x)))
+  return(t(as.matrix(x), ...))
 }
 
 #' @method t ridgelm
+#' @keywords internal
+#' @export
 t.ridgelm <- function(x, ...) {
-  return(t(as.matrix(x)))
+  return(t(as.matrix(x), ...))
 }
 
 #' @method t list
+#' @keywords internal
+#' @export
 t.list <- function(x, ...) {
-  return(t(as.matrix.list(x)))
+  return(t(as.matrix.list(x), ...))
 }
 
 #' @method as.matrix projection
+#' @keywords internal
 #' @export
 as.matrix.projection <- function(x, ...) {
   if (x$p_type) {
@@ -972,20 +1010,15 @@ as.matrix.projection <- function(x, ...) {
       "clustering and the clusters might have different weights."
     ))
   }
-  if (inherits(x$sub_fit, "list")) {
-    if ("lmerMod" %in% class(x$sub_fit[[1]]) ||
-        "glmerMod" %in% class(x$sub_fit[[1]])) {
-      res <- t(do.call(cbind, lapply(x$sub_fit, as.matrix.lmerMod)))
-    } else {
-      if (inherits(x$sub_fit[[1]], "subfit")) {
-        res <- t(do.call(cbind, lapply(x$sub_fit, as.matrix.subfit)))
-      } else {
-        res <- t(do.call(cbind, lapply(x$sub_fit, as.matrix.lm)))
-      }
-    }
-  } else {
-    res <- t(as.matrix.lm(x$sub_fit))
+  if (!inherits(x$sub_fit, "list")) {
+    x$sub_fit <- list(x$sub_fit)
   }
+  if (!inherits(x$sub_fit[[1]], get_as.matrix_cls_projpred())) {
+    # Throw an error because in this case, we probably need a new
+    # as.matrix.<class_name>() method.
+    stop("This case should not occur. Please notify the package maintainer.")
+  }
+  res <- t(do.call(cbind, lapply(x$sub_fit, as.matrix)))
   colnames(res) <- gsub("^1|^alpha|\\(Intercept\\)", "Intercept", colnames(res))
   if (x$family$family == "gaussian") res <- cbind(res, sigma = x$dis)
   return(res)
