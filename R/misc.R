@@ -216,6 +216,7 @@ bootstrap <- function(x, fun = mean, b = 1000, oobfun = NULL, seed = NULL,
 
 .get_refdist <- function(refmodel, ndraws = NULL, nclusters = NULL, seed = NULL,
                          thinning = TRUE) {
+  # TODO: Update the following comment to include the augmented-data approach.
   #
   # Creates the reference distribution based on the refmodel-object, and the
   # desired number of clusters (nclusters) or number of subsamples (ndraws). If
