@@ -7,7 +7,7 @@
 ### Major changes
 
 * The behavior of arguments `ndraws`, `nclusters`, `ndraws_pred`, and `nclusters_pred` in `varsel()`, `cv_varsel()`, and `project()` has been changed: Now, `ndraws` and `ndraws_pred` have non-`NULL` defaults and for `ndraws <= 20` or `ndraws_pred <= 20`, the value of `ndraws` or `ndraws_pred` is passed to `nclusters` or `nclusters_pred`, respectively (so that clustering is used). (GitHub: commits babe031db7732e0d81dd2591938551d02dcf374d, 4ef95d3b4ab85eaaa5177c4d40f33b2943bff37c, and ce7d1e001fd76830c4379cbbe0dfe730cba8d9e5)
-* For `proj_linpred()` and `proj_predict()`, arguments `nterms`, `ndraws`, and `seed` have been removed to allow the user to pass them to `project()`. New arguments `filter_nterms`, `nclusters_resample`, and `seed_ppd` have been introduced (see the documentation for details). (GitHub: #92, #135)
+* For `proj_linpred()` and `proj_predict()`, arguments `nterms`, `ndraws`, and `seed` have been removed to allow the user to pass them to `project()`. New arguments `filter_nterms`, `nresample_clusters`, and `ppd_seed` have been introduced (see the documentation for details). (GitHub: #92, #135)
 * Reference models lacking an intercept are not supported anymore (actually, the previous implementation for such models was incomplete). Support might be re-introduced in the future (when fixed), but for now it is withdrawn as it requires some larger changes. (GitHub: #124, but see also #96 and #100)
 
 ## Minor changes
@@ -15,6 +15,11 @@
 * Minor documentation improvements.
 * Minor improvements of error messages.
 * For K-fold cross-validation, an internally hard-coded value of 5 for `nclusters_pred` was removed. (GitHub: commit 5062f2ff6f981ab0e4be06b9aaf694dcaa27afa8)
+* Throw a proper error message for nonsupported families. (GitHub: #140)
+* Show the README also on the CRAN website. (GitHub: #140)
+* `project()`: Warn in case of `solution_terms` not being found in the reference model (and therefore getting ignored). (GitHub: #140)
+* Set defaults for `get_refmodel.default()`'s arguments `ref_predfun`, `proj_predfun`, and `div_minimizer`. (GitHub: #140)
+* Explicitly throw an error if argument `extract_model_data` of `get_refmodel.default()` is `NULL`. (GitHub: #140)
 
 ### Bug fixes
 
@@ -26,6 +31,11 @@
 * Minor documentation fixes.
 * Fix a bug for `as.matrix.projection()` in case of 1 (clustered) draw after projection. (GitHub: #130)
 * For submodels of class `"subfit"`, make the column names of `as.matrix.projection()`'s output matrix consistent with other classes of submodels. (GitHub: #132)
+* Fix a bug for argument `nterms_max` of `plot.vsel()` if there is just the intercept-only submodel. (GitHub: #138)
+* Throw an appropriate error message when trying to apply an L1 search to an empty (i.e. intercept-only) reference model. (GitHub: #139)
+* Fix the list names of element `search_path` in, e.g., `varsel()`'s output. (GitHub: #140)
+* Fix a bug (error `unused argument`) when initializing the K reference models in a K-fold CV with CV fits not of class `"brmsfit"` or `"stanreg"`. (GitHub: #140)
+* In `get_refmodel.default()`, remove old defunct arguments `fetch_data`, `wobs`, and `offset`. (GitHub: #140)
 
 ## projpred 2.0.5
 
