@@ -53,8 +53,12 @@ if (require(rstanarm) && Sys.getenv("NOT_CRAN") == "true") {
                       nterms_max = nterms + 1,
                       verbose = FALSE
     )
+    # Note: `c("x.3", "x.5")` are not the two most relevant terms for each
+    # reference model from `vs_list`. But instead of choosing different
+    # `solution_terms` for each reference model, simply take `c("x.3", "x.5")`
+    # for all reference models:
     proj_solution_terms_list <- lapply(vs_list, project,
-                                       solution_terms = c(2, 3),
+                                       solution_terms = c("x.3", "x.5"),
                                        seed = seed
     )
     proj_all_list <- lapply(vs_list, project,
@@ -78,13 +82,13 @@ if (require(rstanarm) && Sys.getenv("NOT_CRAN") == "true") {
     )
     expect_error(
       proj_linpred(proj_solution_terms_list, newdata = data.frame(x = x),
-                   solution_terms = 1:10000),
+                   solution_terms = paste0("x.", 1:10000)),
       paste("^The number of solution terms is greater than the number of",
             "columns in newdata\\.$")
     )
     expect_error(
       proj_linpred(proj_solution_terms_list, newdata = data.frame(x = x)[, 1:2],
-                   solution_terms = 1:3),
+                   solution_terms = paste0("x.", 1:3)),
       paste("^The number of solution terms is greater than the number of",
             "columns in newdata\\.$")
     )
@@ -124,11 +128,11 @@ if (require(rstanarm) && Sys.getenv("NOT_CRAN") == "true") {
   ), {
     expect_error(
       proj_linpred(1, newdata = data.frame(x = x)),
-      "is not a variable selection -object"
+      "is not an object of class \"vsel\""
     )
     expect_error(
       proj_linpred(fit_gauss, newdata = data.frame(x = x)),
-      "is not a variable selection -object"
+      "is not an object of class \"vsel\""
     )
     expect_error(
       proj_linpred(c(proj_solution_terms_list, list(x)), newdata = x),
@@ -353,14 +357,14 @@ if (require(rstanarm) && Sys.getenv("NOT_CRAN") == "true") {
     )
     expect_error(
       proj_predict(proj_solution_terms_list, newdata = data.frame(x = x),
-                   solution_terms = 1:1000),
+                   solution_terms = paste0("x.", 1:1000)),
       paste("^The number of solution terms is greater than the number of",
             "columns in newdata\\.$")
     )
     expect_error(
       proj_predict(proj_solution_terms_list,
                    newdata = data.frame(x = x)[, 1:2],
-                   solution_terms = 1:3
+                   solution_terms = paste0("x.", 1:3)
       ),
       paste("^The number of solution terms is greater than the number of",
             "columns in newdata\\.$")
@@ -403,11 +407,11 @@ if (require(rstanarm) && Sys.getenv("NOT_CRAN") == "true") {
   ), {
     expect_error(
       proj_predict(1, newdata = data.frame(x = x)),
-      "is not a variable selection -object"
+      "is not an object of class \"vsel\""
     )
     expect_error(
       proj_predict(fit_gauss, newdata = data.frame(x = x)),
-      "is not a variable selection -object"
+      "is not an object of class \"vsel\""
     )
     expect_error(
       proj_predict(c(proj_solution_terms_list, list(x)),
@@ -442,11 +446,11 @@ if (require(rstanarm) && Sys.getenv("NOT_CRAN") == "true") {
   test_that("proj_predict: specifying weightsnew has an expected effect", {
     pl <- proj_predict(proj_solution_terms_list[["binom"]],
                        newdata = data.frame(x = x, weights = rep(1, NROW(x))),
-                       seed = seed, seed_ppd = seed
+                       seed = seed, ppd_seed = seed
     )
     plw <- proj_predict(proj_solution_terms_list[["binom"]],
                         newdata = data.frame(x = x, weights = weights),
-                        seed = seed, seed_ppd = seed,
+                        seed = seed, ppd_seed = seed,
                         weightsnew = ~weights
     )
     expect_true(sum(pl != plw) > 0)
@@ -456,20 +460,20 @@ if (require(rstanarm) && Sys.getenv("NOT_CRAN") == "true") {
     for (i in seq_len(length(proj_solution_terms_list))) {
       i_inf <- names(proj_solution_terms_list)[i]
       pl <- proj_predict(proj_solution_terms_list[[i]],
-                         newdata = data.frame(x = x), nclusters_resample = iter,
-                         seed = seed, seed_ppd = seed
+                         newdata = data.frame(x = x), nresample_clusters = iter,
+                         seed = seed, ppd_seed = seed
       )
       plo <- proj_predict(proj_solution_terms_list[[i]],
                           newdata = data.frame(x = x, offset = offset),
-                          nclusters_resample = iter,
-                          seed = seed, seed_ppd = seed, offsetnew = ~offset
+                          nresample_clusters = iter,
+                          seed = seed, ppd_seed = seed, offsetnew = ~offset
       )
       expect_true(sum(pl != plo) > 0, info = i_inf)
     }
   })
 
   test_that(paste(
-    "proj_predict: specifying nclusters_resample has an expected effect"
+    "proj_predict: specifying nresample_clusters has an expected effect"
   ), {
     for (i in 1:length(proj_solution_terms_list)) {
       i_inf <- names(proj_solution_terms_list)[i]
@@ -481,17 +485,17 @@ if (require(rstanarm) && Sys.getenv("NOT_CRAN") == "true") {
   })
 
   test_that(paste(
-    "proj_predict: specifying seed and seed_ppd has an expected",
+    "proj_predict: specifying seed and ppd_seed has an expected",
     "effect"
   ), {
     for (i in 1:length(proj_solution_terms_list)) {
       i_inf <- names(proj_solution_terms_list)[i]
       pl1 <- proj_predict(proj_solution_terms_list[[i]],
                           newdata = data.frame(x = x),
-                          seed = seed, seed_ppd = seed)
+                          seed = seed, ppd_seed = seed)
       pl2 <- proj_predict(proj_solution_terms_list[[i]],
                           newdata = data.frame(x = x),
-                          seed = seed, seed_ppd = seed)
+                          seed = seed, ppd_seed = seed)
       expect_equal(pl1, pl2, info = i_inf)
     }
   })
@@ -501,21 +505,21 @@ if (require(rstanarm) && Sys.getenv("NOT_CRAN") == "true") {
       i_inf <- names(vs_list)[i]
       prp1 <- proj_predict(vs_list[[i]],
                            newdata = data.frame(x = x),
-                           nclusters_resample = 100,
-                           seed = 12, seed_ppd = 12, nterms = c(2, 4),
+                           nresample_clusters = 100,
+                           seed = 12, ppd_seed = 12, nterms = c(2, 4),
                            nclusters = 2,
                            regul = 1e-08
       )
       prp2 <- proj_predict(vs_list[[i]],
                            newdata = data.frame(x = x),
-                           nclusters_resample = 100,
+                           nresample_clusters = 100,
                            nterms = c(2, 4), nclusters = 2, regul = 1e-8,
-                           seed = 12, seed_ppd = 12
+                           seed = 12, ppd_seed = 12
       )
       prp3 <- proj_predict(vs_list[[i]],
                            newdata = data.frame(x = x),
-                           nclusters_resample = 100,
-                           seed = 120, seed_ppd = 120, nterms = c(2, 4),
+                           nresample_clusters = 100,
+                           seed = 120, ppd_seed = 120, nterms = c(2, 4),
                            nclusters = 2,
                            regul = 1e-08
       )
