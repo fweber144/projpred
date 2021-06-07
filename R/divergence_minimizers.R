@@ -18,10 +18,10 @@ linear_mle <- function(formula, data, family, weights = NULL, regul = NULL,
   if (inherits(formula, "formula")) {
     return(fit_glm_ridge_callback(formula, data, family, weights, var, regul))
   } else if (inherits(formula, "list")) {
-    return(lapply(seq_along(formula), function(s) {
+    return(foreach(s = seq_along(formula)) %dorng% {
       fit_glm_ridge_callback(formula[[s]], data, family, weights,
                              regul = regul, var = var[, s, drop = FALSE])
-    }))
+    })
   } else {
     stop("The provided formula is neither a formula object nor a list")
   }

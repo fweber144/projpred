@@ -36,7 +36,9 @@ Imports:
     magrittr,
     mgcv,
     gamm4,
-    rlang
+    rlang,
+    foreach,
+    doRNG
 LinkingTo: Rcpp, RcppArmadillo
 License: GPL-3
 LazyData: TRUE
