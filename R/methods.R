@@ -1129,10 +1129,6 @@ cv_ids <- function(n, K, out = c("foldwise", "indices"), seed = NULL) {
   return(cv)
 }
 
-is.vsel <- function(object) {
-  inherits(object, "vsel")
-}
-
 #' Recovers solution path from a variable selection object.
 #'
 #' @param object A vsel object returned by \link[=varsel]{varsel} or
@@ -1140,7 +1136,5 @@ is.vsel <- function(object) {
 #' @return Variable selection solution path
 #' @export
 solution_terms <- function(object) {
-  stopifnot(is.vsel(object))
-
   return(object$solution_terms)
 }
