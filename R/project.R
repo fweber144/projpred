@@ -115,16 +115,19 @@ project <- function(object, nterms = NULL, solution_terms = NULL,
 
   refmodel <- get_refmodel(object, ...)
 
-  if (cv_search) {
-    ## use non-cv_searched solution for datafits
-    cv_search <- !inherits(refmodel, "datafit")
+  if (cv_search && inherits(refmodel, "datafit")) {
+    warning("For \"datafit\" reference models, `cv_search` is automatically ",
+            "set to `FALSE`.")
+    cv_search <- FALSE
   }
 
-  if (!is.null(solution_terms) &&
-      any(object$solution_terms[1:length(solution_terms)] != solution_terms)) {
-    ## search path not found, or the given variable combination
-    ## not in the search path, then we need to project the
-    ## required variables
+  if (!cv_search &&
+      !is.null(solution_terms) &&
+      !setequal(object$solution_terms[seq_along(solution_terms)],
+                solution_terms)) {
+    warning("The given `solution_terms` are not part of the search path (from ",
+            "`solution_terms(object)`), so `cv_search` is automatically set ",
+            "to `TRUE`.")
     cv_search <- TRUE
   }
 
