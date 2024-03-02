@@ -133,7 +133,7 @@
       <h1 data-toc-skip>Latent projection predictive feature
 selection</h1>
             
-            <h4 data-toc-skip class="date">2023-12-14</h4>
+            <h4 data-toc-skip class="date">2024-03-02</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/projpred/blob/HEAD/vignettes/latent.Rmd" class="external-link"><code>vignettes/latent.Rmd</code></a></small>
       <div class="hidden name"><code>latent.Rmd</code></div>
@@ -401,7 +401,7 @@ projection’s later:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">time_lat</span><span class="op">)</span></span></code></pre></div>
 <pre><code>   user  system elapsed 
-  0.888   0.064   0.952 </code></pre>
+   0.85    0.00    0.85 </code></pre>
 <p>The message telling that <code>&lt;refmodel&gt;$dis</code> consists
 of only <code>NA</code>s will not concern us here because we will only
 be focusing on response-scale post-processing.</p>
@@ -463,49 +463,49 @@ Argument `refit_prj`: TRUE
 
 Submodel performance evaluation summary (response scale) with `deltas = FALSE` and `cumulate = FALSE`:
  size ranking_fulldata cv_proportions_diag    mlpd mlpd.lower mlpd.upper
-    0      (Intercept)                  NA -6274.5    -9064.9    -3484.0
-    1              x.4                  NA -4194.7    -6062.2    -2327.3
-    2              x.6                  NA -1418.9    -1968.0     -869.9
-    3             x.10                  NA  -455.3     -652.5     -258.2
-    4              x.3                  NA  -432.9     -673.2     -192.7
-    5              x.1                  NA  -147.4     -225.2      -69.7
-    6              x.2                  NA   -56.4      -81.6      -31.2
-    7              x.8                  NA  -102.5     -156.1      -48.9
-    8              x.7                  NA  -101.1     -155.1      -47.2
-    9              x.5                  NA  -107.3     -173.0      -41.6
-   10             xcat                  NA    -7.6      -10.8       -4.4
-   11             xn.6                  NA    -7.2      -10.2       -4.3
-   12              x.9                  NA    -3.0       -3.3       -2.7
-   13            xn.26                  NA    -3.0       -3.3       -2.7
-   14            xn.29                  NA    -2.9       -3.2       -2.6
+    0      (Intercept)                  NA -6263.5    -9049.5    -3477.5
+    1              x.4                  NA -4185.6    -6048.2    -2323.0
+    2              x.6                  NA -1426.4    -1977.1     -875.6
+    3             x.10                  NA  -470.7     -674.1     -267.3
+    4              x.3                  NA  -442.9     -687.2     -198.5
+    5              x.1                  NA  -162.0     -245.5      -78.4
+    6              x.2                  NA   -64.5      -94.6      -34.4
+    7              x.8                  NA  -106.1     -161.4      -50.9
+    8              x.7                  NA  -106.3     -161.7      -50.8
+    9             xcat                  NA   -16.7      -25.8       -7.5
+   10              x.5                  NA    -8.3      -11.9       -4.7
+   11             xn.6                  NA    -8.4      -11.9       -4.8
+   12              x.9                  NA    -2.9       -3.2       -2.6
+   13            xn.29                  NA    -2.9       -3.2       -2.6
+   14            xn.14                  NA    -2.9       -3.2       -2.6
  mlpd.diff
-  -6271.28
-  -4191.54
-  -1415.69
-   -452.10
-   -429.72
-   -144.23
-    -53.18
-    -99.31
-    -97.90
-   -104.10
-     -4.38
-     -4.02
-      0.24
-      0.26
-      0.27
+  -6260.28
+  -4182.41
+  -1423.14
+   -467.48
+   -439.64
+   -158.78
+    -61.27
+   -102.91
+   -103.03
+    -13.45
+     -5.10
+     -5.15
+      0.28
+      0.29
+      0.28
 
 Reference model performance evaluation summary (response scale) with `deltas = FALSE`:
       mlpd mlpd.lower mlpd.upper 
       -3.2       -3.5       -2.9 </code></pre>
 <p>On absolute scale (column <code>mlpd</code>), we see that submodel
-size 11 leads to an MLPD of <code>-7.2</code>, i.e., a geometric mean
+size 11 leads to an MLPD of <code>-8.4</code>, i.e., a geometric mean
 predictive density (GMPD; due to the discrete response family, the
 “density” values are probabilities here, so we will report the GMPD as
-percentage) of <code>exp(-7.2)</code> which is ca. 0.0747 % whereas size
-12 leads to a GMPD of ca. 4.98 %. This is a considerable improvement
-from size 11 to size 12, so another justification for size 12. (Size 13
-would have resulted in about the same GMPD as size 12.)</p>
+percentage) of <code>exp(-8.4)</code> which is ca. 0.0225 % whereas size
+12 leads to a GMPD of ca. 5.5 %. This is a considerable improvement from
+size 11 to size 12, so another justification for size 12. (Size 13 would
+have resulted in about the same GMPD as size 12.)</p>
 <p>In the predictor ranking up to the selected size of 12, we can see
 that apart from the noise term <code>xn.6</code>,
 <strong>projpred</strong> has correctly selected the truly relevant
@@ -514,7 +514,7 @@ more clearly using the following code:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rk_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ranking.html">ranking</a></span><span class="op">(</span><span class="va">vs_lat</span><span class="op">)</span></span>
 <span><span class="op">(</span> <span class="va">predictors_final_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">rk_lat</span><span class="op">[[</span><span class="st">"fulldata"</span><span class="op">]</span><span class="op">]</span>, <span class="va">size_decided_lat</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
-<pre><code> [1] "x.4"  "x.6"  "x.10" "x.3"  "x.1"  "x.2"  "x.8"  "x.7"  "x.5"  "xcat"
+<pre><code> [1] "x.4"  "x.6"  "x.10" "x.3"  "x.1"  "x.2"  "x.8"  "x.7"  "xcat" "x.5" 
 [11] "xn.6" "x.9" </code></pre>
 <p>We will skip post-selection inference here (see the main vignette for
 a demonstration of post-selection inference), but note that
@@ -554,7 +554,7 @@ projection would have given:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">time_trad</span><span class="op">)</span></span></code></pre></div>
 <pre><code>   user  system elapsed 
-  1.395   0.000   1.395 </code></pre>
+  1.251   0.000   1.250 </code></pre>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span> <span class="va">gg_trad</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vs_trad</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, deltas <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
 <p><img src="latent_files/figure-html/post_vs_trad-1.png" width="90%" style="display: block; margin: auto;"></p>
@@ -584,36 +584,36 @@ Argument `refit_prj`: TRUE
 Submodel performance evaluation summary with `deltas = FALSE` and `cumulate = FALSE`:
  size ranking_fulldata cv_proportions_diag  mlpd mlpd.lower mlpd.upper
     0      (Intercept)                  NA -3471      -5065      -1877
-    1              x.6                  NA -2546      -3615      -1478
-    2            xn.12                  NA -3562      -5229      -1894
-    3             xcat                  NA -3777      -5557      -1998
-    4              x.4                  NA -2435      -3564      -1306
-    5             x.10                  NA  -964      -1453       -474
-    6              x.3                  NA  -812      -1327       -298
-    7            xn.11                  NA  -681      -1120       -243
-    8             xn.2                  NA -1309      -2079       -540
-    9            xn.22                  NA -1204      -1919       -488
-   10              x.2                  NA  -728      -1118       -339
-   11              x.1                  NA  -106       -142        -70
-   12            xn.23                  NA   -85       -120        -51
-   13            xn.16                  NA  -122       -190        -54
-   14              x.8                  NA   -96       -141        -52
+    1              x.6                  NA -2548      -3617      -1479
+    2            xn.12                  NA -3560      -5226      -1894
+    3             xcat                  NA -3775      -5552      -1997
+    4              x.4                  NA -2435      -3565      -1306
+    5             x.10                  NA  -962      -1453       -472
+    6              x.3                  NA  -819      -1338       -301
+    7            xn.11                  NA  -684      -1122       -245
+    8             xn.2                  NA -1315      -2086       -543
+    9            xn.22                  NA -1209      -1927       -492
+   10              x.2                  NA  -732      -1122       -341
+   11              x.1                  NA  -107       -143        -70
+   12            xn.23                  NA   -83       -116        -50
+   13            xn.16                  NA  -121       -189        -53
+   14              x.8                  NA   -90       -132        -48
  mlpd.diff
      -3468
-     -2543
-     -3558
-     -3774
+     -2545
+     -3557
+     -3771
      -2432
-      -960
-      -809
-      -678
-     -1306
-     -1201
-      -725
+      -959
+      -816
+      -680
+     -1311
+     -1206
+      -728
       -103
-       -82
-      -119
-       -93
+       -80
+      -118
+       -87
 
 Reference model performance evaluation summary with `deltas = FALSE`:
       mlpd mlpd.lower mlpd.upper 
@@ -791,37 +791,37 @@ Argument `refit_prj`: TRUE
 
 Submodel performance evaluation summary (response scale) with `deltas = FALSE` and `cumulate = FALSE`:
  size ranking_fulldata cv_proportions_diag   mlpd mlpd.lower mlpd.upper
-    0      (Intercept)                  NA -463.7     -653.2     -274.1
-    1              x.4                  NA -113.2     -148.3      -78.0
-    2              x.6                  NA  -22.7      -30.3      -15.2
-    3             x.10                  NA   -8.9      -10.3       -7.6
-    4              x.3                  NA   -5.8       -6.6       -5.1
+    0      (Intercept)                  NA -422.1     -594.4     -249.7
+    1              x.4                  NA -108.8     -142.8      -74.9
+    2              x.6                  NA  -22.1      -29.1      -15.1
+    3             x.10                  NA   -8.8      -10.1       -7.5
+    4              x.3                  NA   -5.8       -6.5       -5.0
     5              x.1                  NA   -4.6       -5.2       -4.0
-    6              x.2                  NA   -4.1       -4.6       -3.6
+    6              x.2                  NA   -4.1       -4.5       -3.6
     7              x.8                  NA   -3.9       -4.3       -3.5
     8            xn.29                  NA   -3.9       -4.3       -3.5
     9              x.5                  NA   -3.8       -4.2       -3.4
-   10              x.7                  NA   -3.7       -4.1       -3.3
+   10              x.7                  NA   -3.7       -4.0       -3.3
    11             xcat                  NA   -3.4       -3.8       -3.1
    12            xn.19                  NA   -3.4       -3.8       -3.1
    13              x.9                  NA   -3.4       -3.8       -3.1
-   14             xn.2                  NA   -3.4       -3.8       -3.1
+   14            xn.31                  NA   -3.4       -3.8       -3.1
  mlpd.diff
-  -4.6e+02
-  -1.1e+02
-  -1.9e+01
-  -5.3e+00
-  -2.1e+00
-  -9.5e-01
-  -4.1e-01
-  -2.1e-01
-  -2.0e-01
-  -1.2e-01
-   6.4e-03
-   2.5e-01
-   2.5e-01
-   2.6e-01
-   2.5e-01
+  -418.389
+  -105.165
+   -18.411
+    -5.097
+    -2.071
+    -0.917
+    -0.383
+    -0.199
+    -0.183
+    -0.092
+     0.032
+     0.246
+     0.243
+     0.254
+     0.257
 
 Reference model performance evaluation summary (response scale) with `deltas = FALSE`:
       mlpd mlpd.lower mlpd.upper 
