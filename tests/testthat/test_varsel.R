@@ -1384,6 +1384,7 @@ test_that("invalid `nloo` fails", {
   skip_if_not(run_cvvs)
   tstsetups_nonkfold <- grep("\\.kfold", names(cvvss), value = TRUE,
                              invert = TRUE)
+  # TODO: Check validate_search(; skip if empty?)
   for (tstsetup in head(tstsetups_nonkfold, 1)) {
     args_cvvs_i <- args_cvvs[[tstsetup]]
     # Use suppressWarnings() because test_that() somehow redirects stderr() and
@@ -1410,6 +1411,7 @@ test_that(paste(
     "\\.glm\\.gauss\\..*\\.default_cvmeth\\.default_search_trms",
     names(cvvss), value = TRUE
   )
+  # TODO: Check validate_search(; skip if empty?)
   for (tstsetup in tstsetups) {
     args_cvvs_i <- args_cvvs[[tstsetup]]
     # Use suppressWarnings() because test_that() somehow redirects stderr() and
@@ -1452,7 +1454,7 @@ test_that("setting `nloo` smaller than the number of observations works", {
     cvvs_nloo <- suppressWarnings(do.call(cv_varsel, c(
       list(object = refmods[[args_cvvs_i$tstsetup_ref]],
            nloo = nloo_tst),
-      excl_nonargs(args_cvvs_i)
+      excl_nonargs(args_cvvs_i, nms_excl_add = "validate_search")
     )))
     vsel_tester(
       cvvs_nloo,
@@ -1461,7 +1463,7 @@ test_that("setting `nloo` smaller than the number of observations works", {
       prd_trms_len_expected = args_cvvs_i$nterms_max,
       method_expected = meth_exp_crr,
       cv_method_expected = "LOO",
-      valsearch_expected = args_cvvs_i$validate_search,
+      valsearch_expected = TRUE,
       nloo_expected = nloo_tst,
       search_terms_expected = args_cvvs_i$search_terms,
       search_trms_empty_size =
