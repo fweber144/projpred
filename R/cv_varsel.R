@@ -340,6 +340,7 @@ cv_varsel.refmodel <- function(
   if (!is.null(search_out)) {
     search_path_fulldata <- search_out[["search_path"]]
   } else {
+    # TODO
     verb_txt_search <- paste0("-----\nRunning ", method, " search ")
     if (validate_search) {
       # Point out that this is the full-data search (if `validate_search` is
@@ -1308,6 +1309,7 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
   y_wobs_test <- as.data.frame(refmodel[nms_y_wobs_test()])
 
   if (verbose) {
+    # TODO
     verb_txt_start <- "-----\nRunning "
     if (!search_out_rks_was_null || !validate_search) {
       verb_txt_mid <- ""

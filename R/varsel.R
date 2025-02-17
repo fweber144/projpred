@@ -387,6 +387,7 @@ varsel.refmodel <- function(
   if (!is.null(search_out)) {
     search_path <- search_out[["search_path"]]
   } else {
+    # TODO
     verb_out("-----\nRunning the search ...", verbose = verbose)
     search_path <- .select(
       refmodel = refmodel, ndraws = ndraws, nclusters = nclusters,
@@ -401,6 +402,7 @@ varsel.refmodel <- function(
   # "Run" the performance evaluation for the submodels along the predictor
   # ranking (in fact, we only prepare the performance evaluation by computing
   # precursor quantities, but for users, this difference is not perceivable):
+  # TODO
   verb_out("-----\nRunning the performance evaluation with `refit_prj = ",
            refit_prj, "` ...", verbose = verbose)
   perf_eval_out <- perf_eval(
