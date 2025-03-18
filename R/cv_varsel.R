@@ -964,22 +964,30 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
     }
 
     if (verbose) {
-      # TODO
+      # TODO: Use if () instead of ifelse():
       verb_out("-----\nRunning ",
                ifelse(!search_out_rks_was_null, "",
+                      ### TODO: Use the get_refdist() object used for `cl_sel` here:
                       paste0(method, " the search with ",
                              ifelse(!is.null(nclusters),
                                     paste0(nclusters, " clusters"),
                                     paste0(ndraws, " draws (from thinning)")),
-                             " and ")),
+                             " and ")
+                      ###
+                      ),
                "the performance evaluation with ",
                ifelse(refit_prj,
+                      ### TODO: Use the get_refdist() object used for `cl_pred` here:
                       ifelse(!is.null(nclusters_pred),
                              paste0(nclusters_pred, " clusters"),
                              paste0(ndraws_pred, " draws (from thinning)")),
+                      ###
+                      ### TODO: Can we use the get_refdist() object used for `cl_sel` here?:
                       ifelse(!is.null(nclusters),
                              paste0(nclusters, " clusters"),
-                             paste0(ndraws, " draws (from thinning)"))),
+                             paste0(ndraws, " draws (from thinning)"))
+                      ###
+                      ),
                " (`refit_prj = ", refit_prj,
                "`) for each of the `nloo = ", nloo, "` ",
                "LOO-CV folds separately ...")
@@ -1002,7 +1010,13 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
           refmodel = refmodel, ndraws = ndraws, nclusters = nclusters,
           reweighting_args = list(cl_ref = cl_sel, wdraws_ref = exp(lw[, i])),
           method = method, nterms_max = nterms_max, penalty = penalty,
-          verbose = verbose_search, search_control = search_control,
+          verbose = verbose_search,
+          ### TODO: Mention that this is for a single fold? Same in kfold_varsel():
+          mention_fulldata = FALSE,
+          ###
+          # TODO: get_p_clust() is always used here, but only for reweighting
+          # the draws according to the PSIS weights. How to deal with this?
+          search_control = search_control,
           search_terms = search_terms, est_runtime = FALSE, ...
         )
       }
