@@ -340,33 +340,17 @@ cv_varsel.refmodel <- function(
   if (!is.null(search_out)) {
     search_path_fulldata <- search_out[["search_path"]]
   } else {
-    # TODO
-    verb_txt_search <- paste0("-----\nRunning ", method, " search ")
-    if (validate_search) {
-      # Point out that this is the full-data search (if `validate_search` is
-      # `FALSE`, this is still a full-data search, but in that case, there are
-      # no fold-wise searches, so pointing out "full-data" could be confusing):
-      verb_txt_search <- paste0(verb_txt_search, "using the full dataset ")
-    }
-    # Note concerning the following verbose text: If `nclusters == S`,
-    # get_refdist() will use "thinning", not "clustering" (in that case, they
-    # give the same set of draws, namely the original one; hence the quotation
-    # marks), but here for this verbose message, we do not want to make things
-    # too complicated:
-    verb_txt_search <- paste0(verb_txt_search, "with ",
-                              ifelse(!is.null(nclusters),
-                                     paste0(nclusters, " clusters "),
-                                     paste0(ndraws, " draws (from thinning) ")))
-    verb_txt_search <- paste0(verb_txt_search, "...")
-    verb_out(verb_txt_search, verbose = verbose)
+    # Set `mention_fulldata = validate_search` to point out that this is the
+    # full-data search (if `validate_search` is `FALSE`, this is still a
+    # full-data search, but in that case, there are no fold-wise searches, so
+    # declaring this as a full-data search could be confusing):
     search_path_fulldata <- .select(
       refmodel = refmodel, ndraws = ndraws, nclusters = nclusters,
       method = method, nterms_max = nterms_max, penalty = penalty,
-      verbose = verbose, search_control = search_control,
-      search_terms = search_terms,
+      verbose = verbose, mention_fulldata = validate_search,
+      search_control = search_control, search_terms = search_terms,
       search_terms_was_null = search_terms_was_null, ...
     )
-    verb_out("-----", verbose = verbose)
   }
 
   if (!is.null(search_out) && validate_search) {
@@ -980,6 +964,7 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
     }
 
     if (verbose) {
+      # TODO
       verb_out("-----\nRunning ",
                ifelse(!search_out_rks_was_null, "",
                       paste0(method, " the search with ",

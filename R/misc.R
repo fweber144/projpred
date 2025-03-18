@@ -300,6 +300,8 @@ get_standard_y <- function(y, weights, fam) {
 #   `refmodel` object anyway). However, get_p_clust() intentionally seems to
 #   have been kept as general as possible and `wdraws_orig` is more general than
 #   `wdraws_ref`.
+#   * `clust_used`: A single logical value indicating whether clustering (i.e.,
+#   get_p_clust()) has been used.
 get_refdist <- function(refmodel, ndraws = NULL, nclusters = NULL,
                         thinning = TRUE,
                         throw_mssg_ndraws = getOption("projpred.mssg_ndraws",
