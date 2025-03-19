@@ -946,41 +946,48 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
 
     search_out_rks_was_null <- is.null(search_out_rks)
     if (search_out_rks_was_null) {
-      cl_sel <- get_refdist(refmodel, ndraws = ndraws, nclusters = nclusters)$cl
+      refdist_sel <- get_refdist(refmodel, ndraws = ndraws,
+                                 nclusters = nclusters)
+    } else {
+      refdist_sel <- NULL
     }
+    cl_sel <- refdist_sel$cl
     if (refit_prj) {
-      cl_pred <- get_refdist(refmodel, ndraws = ndraws_pred,
-                             nclusters = nclusters_pred)$cl
+      refdist_pred <- get_refdist(refmodel, ndraws = ndraws_pred,
+                                  nclusters = nclusters_pred)
+    } else {
+      refdist_pred <- NULL
     }
+    cl_pred <- refdist_pred$cl
 
     if (verbose) {
-      # TODO: Use if () instead of ifelse():
+      if (refit_prj) {
+        verb_clust_used <- refdist_pred[["clust_used"]]
+        verb_nprjdraws <- refdist_pred[["nprjdraws"]]
+      } else {
+        # NOTE: `!refit_prj` cannot occur in combination with
+        # `!search_out_rks_was_null`, so it is correct and safe to use
+        # `refdist_sel` here.
+        verb_clust_used <- refdist_sel[["clust_used"]]
+        verb_nprjdraws <- refdist_sel[["nprjdraws"]]
+      }
       verb_out("-----\nRunning ",
-               ifelse(!search_out_rks_was_null, "",
-                      ### TODO: Use the get_refdist() object used for `cl_sel` here:
-                      paste0(method, " the search with ",
-                             ifelse(!is.null(nclusters),
-                                    paste0(nclusters, " clusters"),
-                                    paste0(ndraws, " draws (from thinning)")),
-                             " and ")
-                      ###
-                      ),
-               "the performance evaluation with ",
-               ifelse(refit_prj,
-                      ### TODO: Use the get_refdist() object used for `cl_pred` here:
-                      ifelse(!is.null(nclusters_pred),
-                             paste0(nclusters_pred, " clusters"),
-                             paste0(ndraws_pred, " draws (from thinning)")),
-                      ###
-                      ### TODO: Can we use the get_refdist() object used for `cl_sel` here?:
-                      ifelse(!is.null(nclusters),
-                             paste0(nclusters, " clusters"),
-                             paste0(ndraws, " draws (from thinning)"))
-                      ###
-                      ),
-               " (`refit_prj = ", refit_prj,
-               "`) for each of the `nloo = ", nloo, "` ",
-               "LOO-CV folds separately ...")
+               if (!search_out_rks_was_null) {
+                 ""
+               } else {
+                 paste0(method, " search with ",
+                        refdist_sel[["nprjdraws"]], " ",
+                        if (refdist_sel[["clust_used"]]) {
+                          "clusters"
+                        } else {
+                          "draws (from thinning)"
+                        },
+                        " and ")
+               },
+               "the performance evaluation with ", verb_nprjdraws, " ",
+               if (verb_clust_used) "clusters" else "draws (from thinning)",
+               " (`refit_prj = ", refit_prj, "`) for each of the `nloo = ",
+               nloo, "` LOO-CV folds separately ...")
     }
     one_obs <- function(run_index,
                         verbose_search = verbose &&
