@@ -60,6 +60,7 @@ perf_eval <- function(search_path,
                       wobs_test = refmodel_fulldata$wobs[indices_test],
                       y_test = refmodel_fulldata$y[indices_test],
                       y_oscale_test = refmodel_fulldata$y_oscale[indices_test],
+                      verbose = FALSE,
                       ...) {
   if (!refit_prj) {
     p_ref <- search_path$p_sel
@@ -94,6 +95,10 @@ perf_eval <- function(search_path,
       ))
     }
   }
+  verb_out("-----\nRunning the performance evaluation with ",
+           p_ref[["nprjdraws"]],
+           if (p_ref[["clust_used"]]) " clusters" else " draws (from thinning)",
+           " (`refit_prj = ", refit_prj, "`) ...", verbose = verbose)
   out_by_size <- lapply(nterms, function(size_j) {
     # Fetch the init_submodl() output (of class `submodl`) for the submodel at
     # position `size_j + 1` of the predictor ranking:
@@ -130,6 +135,7 @@ perf_eval <- function(search_path,
     }
     return(c(out_j, list(ce = submodl[["ce"]])))
   })
+  verb_out("-----", verbose = verbose)
   if (return_submodls) {
     return(out_by_size)
   }

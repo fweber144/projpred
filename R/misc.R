@@ -278,6 +278,7 @@ get_standard_y <- function(y, weights, fam) {
 #   * `mu`: An \eqn{N \times S_{\mathrm{prj}}}{N x S_prj} matrix of expected
 #   values for \eqn{y} (probabilities for the response categories in case of the
 #   augmented-data projection) for each draw/cluster.
+#   * `mu_offs`: Same as `mu`, but taking offsets into account.
 #   * `var`: An \eqn{N \times S_{\mathrm{prj}}}{N x S_prj} matrix of predictive
 #   variances for \eqn{y} for each draw/cluster which are needed for projecting
 #   the dispersion parameter (the predictive variances are NA for those families
@@ -287,6 +288,9 @@ get_standard_y <- function(y, weights, fam) {
 #   those families that do not have a dispersion parameter).
 #   * `wdraws_prj`: A vector of length \eqn{S_{\mathrm{prj}}}{S_prj} containing
 #   the weights for the projected draws/clusters.
+#   * `const_wdraws_prj`: A single logical value indicating whether all
+#   projected draws have the same weight.
+#   * `nprjdraws`: A single value: \eqn{S_{\mathrm{prj}}}{S_prj}.
 #   * `cl`: Cluster assignment for each posterior draw, that is, a vector that
 #   has length equal to the number of posterior draws and each value is an
 #   integer between 1 and \eqn{S_{\mathrm{prj}}}{S_prj}.

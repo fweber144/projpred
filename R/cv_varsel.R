@@ -745,28 +745,19 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
     # "Run" the performance evaluation for the submodels along the predictor
     # ranking (in fact, we only prepare the performance evaluation by computing
     # precursor quantities, but for users, this difference is not perceivable):
-    verb_out("-----\nRunning the performance evaluation with ",
-             ifelse(refit_prj,
-                    ifelse(!is.null(nclusters_pred),
-                           paste0(nclusters_pred, " clusters"),
-                           paste0(ndraws_pred, " draws (from thinning)")),
-                    ifelse(!is.null(nclusters),
-                           paste0(nclusters, " clusters"),
-                           paste0(ndraws, " draws (from thinning)"))),
-             " (`refit_prj = ", refit_prj, "`) ...", verbose = verbose)
-    # Step 1: Re-project (using the full dataset) onto the submodels along the
-    # full-data predictor ranking and evaluate their predictive performance.
+    # * Step 1: Re-project (using the full dataset) onto the submodels along the
+    #   full-data predictor ranking and evaluate their predictive performance.
     perf_eval_out <- perf_eval(
       search_path = search_path_fulldata, refmodel = refmodel,
       refit_prj = refit_prj, ndraws = ndraws_pred, nclusters = nclusters_pred,
-      return_p_ref = TRUE, return_preds = TRUE, indices_test = inds, ...
+      return_p_ref = TRUE, return_preds = TRUE, indices_test = inds,
+      verbose = verbose, ...
     )
     clust_used_eval <- perf_eval_out[["clust_used"]]
     nprjdraws_eval <- perf_eval_out[["nprjdraws"]]
     refdist_eval <- perf_eval_out[["p_ref"]]
-
-    # Step 2: Weight the full-data performance evaluation results according to
-    # the PSIS-LOO-CV weights.
+    # * Step 2: Weight the full-data performance evaluation results according to
+    #   the PSIS-LOO-CV weights.
     if (refmodel$family$for_latent) {
       refdist_eval_mu_offs_oscale <- refmodel$family$latent_ilink(
         t(refdist_eval$mu_offs), cl_ref = refdist_eval$cl,
@@ -948,7 +939,6 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
         }
       }
     }
-    verb_out("-----", verbose = verbose)
     # Needed for cutting off post-processed results later:
     prv_len_rk <- length(search_path_fulldata$predictor_ranking)
   } else {
