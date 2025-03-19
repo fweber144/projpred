@@ -1008,11 +1008,14 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
           reweighting_args = list(cl_ref = cl_sel, wdraws_ref = exp(lw[, i])),
           method = method, nterms_max = nterms_max, penalty = penalty,
           verbose = verbose_search,
-          ### TODO: Mention that this is for a single fold? Same in kfold_varsel():
+          ### TODO: Mention that this is for a single fold (potentially naming
+          ### `i`)? Or suppress that verbose message in this case? Same in
+          ### kfold_varsel():
           mention_fulldata = FALSE,
           ###
           # TODO: get_p_clust() is always used here, but only for reweighting
           # the draws according to the PSIS weights. How to deal with this?
+          # Would be obsolete if suppressing that verbose message in this case.
           search_control = search_control,
           search_terms = search_terms, est_runtime = FALSE, ...
         )
