@@ -536,17 +536,9 @@ varsel.refmodel <- function(
   }
 
   verb_out("-----\nRunning ", method, " search ",
-           if (mention_fulldata) {
-             "using the full dataset "
-           } else {
-             ""
-           },
-           "with ",
-           if (p_sel[["clust_used"]]) {
-             paste0(nclusters, " clusters")
-           } else {
-             paste0(ndraws, " draws (from thinning)")
-           },
+           if (mention_fulldata) "using the full dataset " else "",
+           "with ", p_sel[["nprjdraws"]], " ",
+           if (p_sel[["clust_used"]]) "clusters" else "draws (from thinning)",
            " ...", verbose = verbose)
   if (method == "L1") {
     search_path <- search_L1(

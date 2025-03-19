@@ -96,8 +96,8 @@ perf_eval <- function(search_path,
     }
   }
   verb_out("-----\nRunning the performance evaluation with ",
-           p_ref[["nprjdraws"]],
-           if (p_ref[["clust_used"]]) " clusters" else " draws (from thinning)",
+           p_ref[["nprjdraws"]], " ",
+           if (p_ref[["clust_used"]]) "clusters" else "draws (from thinning)",
            " (`refit_prj = ", refit_prj, "`) ...", verbose = verbose)
   out_by_size <- lapply(nterms, function(size_j) {
     # Fetch the init_submodl() output (of class `submodl`) for the submodel at
