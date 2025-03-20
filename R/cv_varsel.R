@@ -758,6 +758,8 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
     refdist_eval <- perf_eval_out[["p_ref"]]
     # * Step 2: Weight the full-data performance evaluation results according to
     #   the PSIS-LOO-CV weights.
+    verb_out("Weighting the full-data performance evaluation results using ",
+             "the PSIS-LOO-CV weights", verbose = verbose)
     if (refmodel$family$for_latent) {
       refdist_eval_mu_offs_oscale <- refmodel$family$latent_ilink(
         t(refdist_eval$mu_offs), cl_ref = refdist_eval$cl,
@@ -939,6 +941,7 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
         }
       }
     }
+    verb_out("-----", verbose = verbose)
     # Needed for cutting off post-processed results later:
     prv_len_rk <- length(search_path_fulldata$predictor_ranking)
   } else {
