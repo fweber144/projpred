@@ -965,14 +965,14 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
 
     if (verbose) {
       if (refit_prj) {
-        verb_clust_used <- refdist_pred[["clust_used"]]
-        verb_nprjdraws <- refdist_pred[["nprjdraws"]]
+        verb_clust_used_eval <- refdist_pred[["clust_used"]]
+        verb_nprjdraws_eval <- refdist_pred[["nprjdraws"]]
       } else {
         # NOTE: `!refit_prj` cannot occur in combination with
         # `!search_out_rks_was_null`, so it is correct and safe to use
         # `refdist_sel` here.
-        verb_clust_used <- refdist_sel[["clust_used"]]
-        verb_nprjdraws <- refdist_sel[["nprjdraws"]]
+        verb_clust_used_eval <- refdist_sel[["clust_used"]]
+        verb_nprjdraws_eval <- refdist_sel[["nprjdraws"]]
       }
       verb_out("-----\nRunning ",
                if (!search_out_rks_was_null) {
@@ -987,8 +987,13 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
                         },
                         " and ")
                },
-               "the performance evaluation with ", verb_nprjdraws, " ",
-               if (verb_clust_used) "clusters" else "draws (from thinning)",
+               "the performance evaluation with ",
+               verb_nprjdraws_eval, " ",
+               if (verb_clust_used_eval) {
+                 "clusters"
+               } else {
+                 "draws (from thinning)"
+               },
                " (`refit_prj = ", refit_prj, "`) for each of the `nloo = ",
                nloo, "` LOO-CV folds separately ...")
     }
@@ -1023,7 +1028,6 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
           # `verbose_txt_obs = NULL` in .select() (and then also remove
           # `May also be `NULL` to omit that verbose message completely.` in the
           # corresponding internal documentation).
-          # TODO: Same in kfold_varsel().
           search_control = search_control,
           search_terms = search_terms, est_runtime = FALSE, ...
         )
@@ -1316,16 +1320,44 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
   y_wobs_test <- as.data.frame(refmodel[nms_y_wobs_test()])
 
   if (verbose) {
-    # TODO
-    verb_txt_start <- "-----\nRunning "
-    if (!search_out_rks_was_null || !validate_search) {
-      verb_txt_mid <- ""
+    # Here in kfold_varsel(), we have no get_refdist() (or get_p_clust()) output
+    # object whose elements `clust_used` and `nprjdraws` we could use, so we
+    # have to rely on a workaround:
+    verb_clust_used_sel <- !is.null(nclusters) &&
+      nclusters < length(refmodel$wdraws_ref)
+    if (verb_clust_used_sel) {
+      verb_clust_txt_sel <- "clusters"
+      verb_nprjdraws_sel <- nclusters
     } else {
-      verb_txt_mid <- "the search and "
+      verb_clust_txt_sel <- "draws (from thinning)"
+      verb_nprjdraws_sel <- ndraws
     }
-    verb_out(verb_txt_start, verb_txt_mid, "the performance evaluation with ",
-             "`refit_prj = ", refit_prj, "` for each of the K = ", K, " CV ",
-             "folds separately ...")
+    if (refit_prj) {
+      verb_clust_used_eval <- !is.null(nclusters_pred) &&
+        nclusters_pred < length(refmodel$wdraws_ref)
+      if (verb_clust_used_eval) {
+        verb_nprjdraws_eval <- nclusters_pred
+      } else {
+        verb_nprjdraws_eval <- ndraws_pred
+      }
+    } else {
+      # NOTE: `!refit_prj` cannot occur in combination with
+      # `!search_out_rks_was_null || !validate_search`, so it is correct and
+      # safe to use `verb_clust_used_sel` and `verb_nprjdraws_sel` here.
+      verb_clust_used_eval <- verb_clust_used_sel
+      verb_nprjdraws_eval <- verb_nprjdraws_sel
+    }
+    verb_out("-----\nRunning ",
+             if (!search_out_rks_was_null || !validate_search) {
+               ""
+             } else {
+               paste0(method, " search with ", verb_nprjdraws_sel, " ",
+                      verb_clust_txt_sel, " and ")
+             },
+             "the performance evaluation with ", verb_nprjdraws_eval, " ",
+             if (verb_clust_used_eval) "clusters" else "draws (from thinning)",
+             " (`refit_prj = ", refit_prj, "`) for each of the `K = ",
+             K, "` CV folds separately ...")
   }
   one_fold <- function(fold,
                        rk,
