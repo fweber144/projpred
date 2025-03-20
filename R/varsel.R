@@ -390,7 +390,7 @@ varsel.refmodel <- function(
     search_path <- .select(
       refmodel = refmodel, ndraws = ndraws, nclusters = nclusters,
       method = method, nterms_max = nterms_max, penalty = penalty,
-      verbose = verbose, mention_fulldata = FALSE, search_control = search_control,
+      verbose = verbose, search_control = search_control,
       search_terms = search_terms,
       search_terms_was_null = search_terms_was_null, ...
     )
@@ -511,9 +511,9 @@ varsel.refmodel <- function(
 #   weights), then this needs to be a `list` with elements `wdraws_ref` and
 #   `cl_ref`. For these two elements, see the (internal) documentation of
 #   weighted_summary_means().
-# @param mention_fulldata A single logical value indicating whether the
-#   verbose-mode information should mention that this is a full-data search,
-#   i.e., using all observations.
+# @param verbose_txt_obs Passed to `...` of verb_out(), so character string(s)
+#   to be included in the verbose message indicating the start of the search.
+#   May also be `NULL` to omit that verbose message completely.
 # For all other arguments, see the documentation of varsel().
 #
 # @return A list with elements `predictor_ranking` (the predictor ranking
@@ -522,7 +522,7 @@ varsel.refmodel <- function(
 #   of fits per model size being equal to the number of projected draws), and
 #   `p_sel` (the output from get_refdist() for the search).
 .select <- function(refmodel, ndraws, nclusters, reweighting_args = NULL,
-                    method, nterms_max, penalty, verbose, mention_fulldata,
+                    method, nterms_max, penalty, verbose, verbose_txt_obs = "",
                     search_control, ...) {
   if (is.null(reweighting_args)) {
     p_sel <- get_refdist(refmodel, ndraws = ndraws, nclusters = nclusters)
@@ -535,11 +535,12 @@ varsel.refmodel <- function(
     )
   }
 
-  verb_out("-----\nRunning ", method, " search ",
-           if (mention_fulldata) "using the full dataset " else "",
-           "with ", p_sel[["nprjdraws"]], " ",
-           if (p_sel[["clust_used"]]) "clusters" else "draws (from thinning)",
-           " ...", verbose = verbose)
+  if (!is.null(verbose_txt_obs)) {
+    verb_out("-----\nRunning ", method, " search ", verbose_txt_obs, "with ",
+             p_sel[["nprjdraws"]], " ",
+             if (p_sel[["clust_used"]]) "clusters" else "draws (from thinning)",
+             " ...", verbose = verbose)
+  }
   if (method == "L1") {
     search_path <- search_L1(
       p_ref = p_sel, refmodel = refmodel, nterms_max = nterms_max,
@@ -551,7 +552,9 @@ varsel.refmodel <- function(
       verbose = verbose, search_control = search_control, ...
     )
   }
-  verb_out("-----", verbose = verbose)
+  if (!is.null(verbose_txt_obs)) {
+    verb_out("-----", verbose = verbose)
+  }
 
   search_path$p_sel <- p_sel
   return(search_path)
