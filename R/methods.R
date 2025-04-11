@@ -734,17 +734,12 @@ plot.vsel <- function(
   # .tabulate_stats()'s argument `nfeat_baseline`:
   nfeat_baseline <- get_nfeat_baseline(object, baseline, stats[1],
                                        resp_oscale = resp_oscale)
-  ## if (getOption("projpred.extra_verbose",FALSE) &&
-  ##       deltas &&
-  ##       !all(stats %in% c("elpd","mlpd","gmpd"))) {
-  ##   message(paste0("With deltas=TRUE, statistics ", paste(stats[!(stats %in% c("elpd","mlpd","gmpd"))], collapse=", "),
-  ##                  " report the uncertainty relative to the baseline, but the value in the original scale."))
-  ## }
-  if (is.character(deltas) || deltas) {
+  if (identical(deltas, "mixed") || deltas) {
     nfeat_baseline_for_tab <- nfeat_baseline
   } else {
     nfeat_baseline_for_tab <- NULL
   }
+
   # Compute the predictive performance statistics:
   stats_table_all <- .tabulate_stats(object, stats, alpha = alpha,
                                      nfeat_baseline = nfeat_baseline_for_tab,
@@ -753,10 +748,10 @@ plot.vsel <- function(
   stats_sub <- subset(stats_table_all, stats_table_all$size != Inf)
   stats_bs <- subset(stats_table_all, stats_table_all$size == nfeat_baseline)
 
-  if (!is.character(deltas) && deltas) {
+  if (isTRUE(deltas)) {
     stats_ref[,'value'] <- 0
     stats_ref[stats_ref[,'statistic']=="gmpd",'value'] <- 1
-  } else if (is.character(deltas) && identical(deltas,'mixed')) {
+  } else if (identical(deltas, "mixed")) {
     stats_ref[stats_ref[,'statistic'] %in% c("elpd","mlpd"),'value'] <- 0
     stats_ref[stats_ref[,'statistic']=="gmpd",'value'] <- 1
     stats_sub[!(stats_sub[,'statistic'] %in% c("elpd","mlpd","gmpd")),'diff'] <-
@@ -798,8 +793,8 @@ plot.vsel <- function(
 
   # Define some "pretty" text strings for the plot:
   ylab <- "Value"
-  if (is.character(deltas) || deltas) {
-    delta_lab <- "for baseline comparison"
+  if (identical(deltas, "mixed") || deltas) {
+    delta_lab <- " for baseline comparison (point estimate on absolute scale)"
   } else {
     delta_lab <- ""
   }
@@ -1145,7 +1140,7 @@ plot.vsel <- function(
          subtitle = paste0("With ",
                            round(100 * (1 - alpha), 1), "% ",
                            ci_type,
-                           "intervals ",
+                           "intervals",
                            delta_lab)) +
     theme(axis.text.x.bottom = element_text(angle = text_angle,
                                             hjust = hjust_val,
@@ -1339,7 +1334,7 @@ summary.vsel <- function(
 ) {
   validate_vsel_object_stats(object, stats, resp_oscale = resp_oscale)
   baseline <- validate_baseline(object$refmodel, baseline, deltas)
-  
+
   # Initialize output:
   out <- c(
     object$refmodel[c("formula", "family")],
@@ -1365,15 +1360,12 @@ summary.vsel <- function(
   }
 
   # The full table of the performance statistics from `stats`:
-  ## if (is.character(deltas) || deltas) {
-    nfeat_baseline_for_tab <- get_nfeat_baseline(object, baseline, stats[1],
-                                                 resp_oscale = resp_oscale)
-  ## } else {
-  ##   nfeat_baseline_for_tab <- NULL
-  ## }
+  nfeat_baseline_for_tab <- get_nfeat_baseline(object, baseline, stats[1],
+                                               resp_oscale = resp_oscale)
   stats_table_all <- .tabulate_stats(object, stats, alpha = alpha,
                                      nfeat_baseline = nfeat_baseline_for_tab,
                                      resp_oscale = resp_oscale, ...)
+
   # Extract the reference model performance results from `stats_table_all`:
   stats_table_ref <- subset(stats_table_all, stats_table_all$size == Inf)
 
@@ -1442,7 +1434,7 @@ summary.vsel <- function(
 # reference model performance and one table for the submodel performance):
 mk_colnms_smmry <- function(type, stats, deltas) {
   # Pre-process `type`:
-  if (is.null(deltas) || (is.character(deltas) || deltas)) {
+  if (is.null(deltas) || (identical(deltas, "mixed") || deltas)) {
     type <- setdiff(type, c("diff", "diff.se"))
   }
   type_dot <- paste0(".", type)
@@ -1763,7 +1755,6 @@ suggest_size.vsel <- function(
   if (is.na(thres_elpd)) {
     thres_elpd <- Inf
   }
-
   nobs_test <- object$nobs_test
   res <- stats[
     (sgn * stats[, bound] >= util_cutoff) |
