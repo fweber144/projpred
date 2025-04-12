@@ -668,11 +668,13 @@ proj_predict_aux <- function(proj, newdata, offsetnew, weightsnew,
 #' # Horizontal lines
 #'
 #' As long as the reference model's performance is computable, it is always
-#' shown in the plot as a dashed red horizontal line. 
+#' shown in the plot as a dashed red horizontal line. If `baseline = "best"`,
+#' the baseline model's performance is shown as a dotted black horizontal line.
 #' If `!is.na(thres_elpd)` and `any(stats %in% c("elpd", "mlpd", "gmpd"))`, the
 #' value supplied to `thres_elpd` (which is automatically adapted internally in
 #' case of the MLPD or the GMPD or `deltas = FALSE`) is shown as a dot-dashed
-#' gray horizontal line for the reference model.
+#' gray horizontal line for the reference model and, if `baseline = "best"`, as
+#' a long-dashed green horizontal line for the baseline model.
 #'
 #' @examplesIf requireNamespace("rstanarm", quietly = TRUE)
 #' # Data:
@@ -700,7 +702,7 @@ plot.vsel <- function(
     stats = "elpd",
     deltas = FALSE,
     alpha = 2 * pnorm(-1),
-    baseline = "ref",
+    baseline = if (!inherits(x$refmodel, "datafit")) "ref" else "best",
     thres_elpd = NA,
     resp_oscale = TRUE,
     point_size = 3,
@@ -720,7 +722,7 @@ plot.vsel <- function(
   # Parse input:
   object <- x
   validate_vsel_object_stats(object, stats, resp_oscale = resp_oscale)
-  baseline <- validate_baseline(object$refmodel, baseline, deltas)
+  baseline <- validate_baseline(object, baseline, deltas)
   if (!is.null(ranking_repel) && !requireNamespace("ggrepel", quietly = TRUE)) {
     warning("Package 'ggrepel' is needed for a non-`NULL` argument ",
             "`ranking_repel`, but could not be found. Setting `ranking_repel` ",
@@ -729,6 +731,7 @@ plot.vsel <- function(
   } else if (!is.null(ranking_repel)) {
     stopifnot(isTRUE(ranking_repel %in% c("text", "label")))
   }
+  stopifnot(isTRUE(deltas) || isFALSE(deltas) || identical(deltas, "mixed")) # TODO: Should `deltas = "mixed"` be disallowed for ELPD, MLPD, GMPD?
 
   # Define `nfeat_baseline` and a slightly modified variant that can be used for
   # .tabulate_stats()'s argument `nfeat_baseline`:
@@ -794,7 +797,7 @@ plot.vsel <- function(
   # Define some "pretty" text strings for the plot:
   ylab <- "Value"
   if (identical(deltas, "mixed") || deltas) {
-    delta_lab <- " for baseline comparison (point estimate on absolute scale)"
+    delta_lab <- " for baseline comparison (point estimate on original scale)"
   } else {
     delta_lab <- ""
   }
@@ -967,14 +970,14 @@ plot.vsel <- function(
   }
 
   # Create the plot:
-  if (is.character(deltas) || deltas) {
+  if (identical(deltas, "mixed") || deltas) {
     data_gg$statistic[data_gg$statistic=="elpd"] <- "elpd_diff"
     stats_ref$statistic[stats_ref$statistic=="elpd"] <- "elpd_diff"
     data_gg$statistic[data_gg$statistic=="mlpd"] <- "mlpd_diff"
     stats_ref$statistic[stats_ref$statistic=="mlpd"] <- "mlpd_diff"
     data_gg$statistic[data_gg$statistic=="gmpd"] <- "gmpd_ratio"
     stats_ref$statistic[stats_ref$statistic=="gmpd"] <- "gmpd_ratio"
-    if (!(is.character(deltas) && identical(deltas,'mixed'))) {
+    if (!identical(deltas, "mixed")) {
       data_gg$statistic[data_gg$statistic=="mse"] <- "mse_diff"
       stats_ref$statistic[stats_ref$statistic=="mse"] <- "mse_diff"
       data_gg$statistic[data_gg$statistic=="rmse"] <- "rmse_diff"
@@ -991,7 +994,7 @@ plot.vsel <- function(
     }
   }
 
-  if (is.character(deltas) || deltas) {
+  if (identical(deltas, "mixed") || deltas) {
     pp <- ggplot(data = data_gg,
                  mapping = aes(x = .data[["size"]], y = .data[["diff"]],
                                ymin = .data[["diff.lq"]], ymax = .data[["diff.uq"]]))
@@ -1016,9 +1019,9 @@ plot.vsel <- function(
       thres_tab_ref$thres[is_elpd_mlpd_ref] <-
         thres_tab_ref$value[is_elpd_mlpd_ref] +
         thres_tab_ref$thres[is_elpd_mlpd_ref]
-      is_gmpd_ref <- thres_tab_ref$statistic %in% c("gmpd","gmpd ratio")
+      is_gmpd_ref <- thres_tab_ref$statistic %in% c("gmpd", "gmpd ratio")
       thres_tab_ref$thres[is_gmpd_ref] <-
-              thres_tab_ref$value[is_gmpd_ref] *
+        thres_tab_ref$value[is_gmpd_ref] *
         thres_tab_ref$thres[is_gmpd_ref]
       pp <- pp +
         geom_hline(aes(yintercept = .data[["thres"]]),
@@ -1102,7 +1105,7 @@ plot.vsel <- function(
   }
   if (all(stats %in% c("auc"))) {
     ci_type <- "bootstrap "
-  } else if (all(!stats %in% c("auc"))) {
+  } else if (all(!stats %in% c("auc"))) { # TODO
     ci_type <- "normal-approximation "
   } else {
     ci_type <- ""
@@ -1247,16 +1250,21 @@ plot.vsel <- function(
 #'   statistic divided by the baseline model statistic). For all other `stats`,
 #'   "relatively" refers to the difference from the baseline model (i.e., the
 #'   submodel statistic minus the baseline model statistic). For the ELPD and
-#'   the MLPD, the baseline performance is reported as 0. For the GMPD,
-#'   the baseline performance is reported as 1. For other statistics, the
-#'   baseline performance is reported as 0 if `deltas=TRUE` and in the original
-#'   scale if `deltas="mixed"`. If `deltas=TRUE` or `deltas="mixed"`, for all
+#'   the MLPD, the baseline performance is reported as 0 if `deltas = TRUE`. For the GMPD,
+#'   the baseline performance is reported as 1 `deltas = TRUE`. For other statistics, the
+#'   baseline performance is reported as 0 if `deltas = TRUE` and in the original
+#'   scale if `deltas = "mixed"`. If `deltas = TRUE` or `deltas = "mixed"`, for all
 #'   statistics the related uncertainty is reported relative to the baseline.
 #' @param alpha A number determining the (nominal) coverage `1 - alpha` of the
 #'   confidence intervals. For example, in case of a normal-approximation
 #'   confidence interval, `alpha = 2 * pnorm(-1)` corresponds to a confidence
 #'   interval stretching by one standard error on either side of the point
 #'   estimate.
+#' @param baseline For [summary.vsel()]: Only relevant if `deltas` is `TRUE`. **TODO**: Update `deltas` here (and at similar occurrences)
+#'   For [plot.vsel()]: Always relevant. Either `"ref"` or `"best"`, indicating
+#'   whether the baseline is the reference model or the best submodel found (in
+#'   terms of `stats[1]`), respectively. In case of subsampled LOO-CV, `baseline
+#'   = "best"` is not supported.
 #' @param resp_oscale Only relevant for the latent projection. A single logical
 #'   value indicating whether to calculate the performance statistics on the
 #'   original response scale (`TRUE`) or on latent scale (`FALSE`).
@@ -1327,13 +1335,14 @@ summary.vsel <- function(
     type = c("mean", "se", "diff", "diff.se"),
     deltas = FALSE,
     alpha = 2 * pnorm(-1),
-    baseline = "ref",
+    baseline = if (!inherits(object$refmodel, "datafit")) "ref" else "best",
     resp_oscale = TRUE,
     cumulate = FALSE,
     ...
 ) {
   validate_vsel_object_stats(object, stats, resp_oscale = resp_oscale)
-  baseline <- validate_baseline(object$refmodel, baseline, deltas)
+  baseline <- validate_baseline(object, baseline, deltas)
+  # TODO: Input check for `deltas` (see plot.vsel())
 
   # Initialize output:
   out <- c(
@@ -1623,7 +1632,8 @@ print.vsel <- function(x, digits = getOption("projpred.digits", 2), ...) {
 #'   falls above (or is equal to) \deqn{\texttt{pct} \cdot (u_0 -
 #'   u_{\mathrm{base}})}{pct * (u_0 - u_base)} where \eqn{u_0} denotes the null
 #'   model's estimated utility and \eqn{u_{\mathrm{base}}}{u_base} the baseline
-#'   model's estimated utility.
+#'   model's estimated utility. The baseline model is either the reference model
+#'   or the best submodel found (see argument `baseline` of [summary.vsel()]).
 #'
 #'   In doing so, loss statistics like the root mean squared error (RMSE) and
 #'   the mean squared error (MSE) are converted to utilities by multiplying them
