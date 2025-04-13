@@ -210,13 +210,12 @@ weighted_summary_means <- function(y_wobs_test, family, wdraws, mu, dis, cl_ref,
 
   ## fetch the mu and lppd for the baseline model
   summaries_baseline <- summaries_ref
-  delta <- !is.null(summaries_ref)
+  delta <- !is.null(summaries_ref) # TODO: Does this work?
 
   for (s in seq_along(stats)) {
     stat <- stats[s]
 
     ## reference model statistics
-    summaries <- summaries_ref
     res <- get_stat(summaries = summaries_ref,
                     summaries_baseline = NULL,
                     summaries_fast = NULL,
@@ -224,23 +223,24 @@ weighted_summary_means <- function(y_wobs_test, family, wdraws, mu, dis, cl_ref,
                     varsel$y_wobs_test, stat, alpha = alpha, ...)
     row <- data.frame(
       data = varsel$type_test, size = Inf, delta = delta, statistic = stat,
-      value = res$value, lq = res$lq, uq = res$uq, se = res$se,
-      diff = NA, diff.lq = NA, diff.uq = NA, diff.se = NA
+      value = res$value, lq = res$lq, uq = res$uq, se = res$se, diff = NA,
+      diff.lq = NA, diff.uq = NA,
+      diff.se = NA
     )
     stat_tab <- rbind(stat_tab, row)
 
     ## submodel statistics
     for (k in seq_along(summaries_sub)) {
-      diff <- get_stat(summaries = summaries_sub[[k]],
-                       summaries_baseline = summaries_baseline,
-                       summaries_fast = summaries_fast_sub[[k]],
-                       loo_inds = varsel$loo_inds,
-                       varsel$y_wobs_test, stat, alpha = alpha, ...)
       res <- get_stat(summaries = summaries_sub[[k]],
                       summaries_baseline = NULL,
                       summaries_fast = summaries_fast_sub[[k]],
                       loo_inds = varsel$loo_inds,
                       varsel$y_wobs_test, stat, alpha = alpha, ...)
+      diff <- get_stat(summaries = summaries_sub[[k]],
+                       summaries_baseline = summaries_baseline,
+                       summaries_fast = summaries_fast_sub[[k]],
+                       loo_inds = varsel$loo_inds,
+                       varsel$y_wobs_test, stat, alpha = alpha, ...)
       row <- data.frame(
         data = varsel$type_test, size = k - 1, delta = delta,
         statistic = stat, value = res$value, lq = res$lq, uq = res$uq, se = res$se,
@@ -249,6 +249,7 @@ weighted_summary_means <- function(y_wobs_test, family, wdraws, mu, dis, cl_ref,
       stat_tab <- rbind(stat_tab, row)
     }
   }
+
   return(stat_tab)
 }
 
