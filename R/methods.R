@@ -1116,7 +1116,7 @@ plot.vsel <- function(
   }
   if (all(stats %in% c("auc"))) {
     ci_type <- "bootstrap "
-  } else if (all(!stats %in% c("auc"))) { # TODO
+  } else if (all(!stats %in% c("auc"))) { # TODO: I think this is over-simplified.
     ci_type <- "normal-approximation "
   } else {
     ci_type <- ""

@@ -84,11 +84,9 @@ weighted_summary_means <- function(y_wobs_test, family, wdraws, mu, dis, cl_ref,
 
 # A function to calculate the desired performance statistics, their standard
 # errors, and confidence intervals with coverage `1 - alpha` based on the
-# variable selection output. If `nfeat_baseline` is given, then compute the
-# statistics relative to the baseline model of that size (`nfeat_baseline = Inf`
-# means that the baseline model is the reference model).
+# variable selection output.
 .tabulate_stats <- function(varsel, stats, alpha = 0.05,
-                            nfeat_baseline = Inf, resp_oscale = TRUE, ...) {
+                            resp_oscale = TRUE, ...) {
   stat_tab <- data.frame()
   summaries_ref <- varsel$summaries$ref
   summaries_sub <- varsel$summaries$sub
