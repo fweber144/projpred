@@ -593,6 +593,17 @@ proj_predict_aux <- function(proj, newdata, offsetnew, weightsnew,
 #'
 #' @inheritParams summary.vsel
 #' @param x An object of class `vsel` (returned by [varsel()] or [cv_varsel()]).
+#' @param deltas If `TRUE`, the submodel statistics are estimated relatively to
+#'   the baseline model (see argument `baseline`). For the GMPD, the term
+#'   "relatively" refers to the ratio vs. the baseline model (i.e., the submodel
+#'   statistic divided by the baseline model statistic). For all other `stats`,
+#'   "relatively" refers to the difference from the baseline model (i.e., the
+#'   submodel statistic minus the baseline model statistic). For the ELPD and
+#'   the MLPD, the baseline performance is reported as 0 if `deltas = TRUE`. For the GMPD,
+#'   the baseline performance is reported as 1 `deltas = TRUE`. For other statistics, the
+#'   baseline performance is reported as 0 if `deltas = TRUE` and in the original
+#'   scale if `deltas = "mixed"`. If `deltas = TRUE` or `deltas = "mixed"`, for all
+#'   statistics the related uncertainty is reported relative to the baseline.
 #' @param thres_elpd Only relevant if `any(stats %in% c("elpd", "mlpd",
 #'   "gmpd"))`. The threshold for the ELPD difference (taking the submodel's
 #'   ELPD minus the baseline model's ELPD) above which the submodel's ELPD is
@@ -767,7 +778,7 @@ plot.vsel <- function(
       stats_sub[!(stats_sub[,'statistic'] %in% c("elpd","mlpd","gmpd")),'diff.uq'] +
       stats_ref[!(stats_ref[,'statistic'] %in% c("elpd","mlpd","gmpd")),'value']
   }
-  
+
   # Catch unexpected output from .tabulate_stats():
   if (NROW(stats_sub) == 0) {
     stop(ifelse(length(stats) > 1, "Statistics ", "Statistic "),
@@ -1250,11 +1261,11 @@ plot.vsel <- function(
 #'   statistic divided by the baseline model statistic). For all other `stats`,
 #'   "relatively" refers to the difference from the baseline model (i.e., the
 #'   submodel statistic minus the baseline model statistic). For the ELPD and
-#'   the MLPD, the baseline performance is reported as 0 if `deltas = TRUE`. For the GMPD,
-#'   the baseline performance is reported as 1 `deltas = TRUE`. For other statistics, the
-#'   baseline performance is reported as 0 if `deltas = TRUE` and in the original
-#'   scale if `deltas = "mixed"`. If `deltas = TRUE` or `deltas = "mixed"`, for all
-#'   statistics the related uncertainty is reported relative to the baseline.
+#'   the MLPD, the baseline performance is reported as 0 if `deltas = TRUE`. For
+#'   the GMPD, the baseline performance is reported as 1 `deltas = TRUE`. For
+#'   other statistics, the baseline performance is reported as 0 if `deltas =
+#'   TRUE`. If `deltas = TRUE`, for all statistics the related uncertainty is
+#'   reported relative to the baseline.
 #' @param alpha A number determining the (nominal) coverage `1 - alpha` of the
 #'   confidence intervals. For example, in case of a normal-approximation
 #'   confidence interval, `alpha = 2 * pnorm(-1)` corresponds to a confidence
@@ -1342,7 +1353,6 @@ summary.vsel <- function(
 ) {
   validate_vsel_object_stats(object, stats, resp_oscale = resp_oscale)
   baseline <- validate_baseline(object, baseline, deltas)
-  # TODO: Input check for `deltas` (see plot.vsel())
 
   # Initialize output:
   out <- c(

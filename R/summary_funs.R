@@ -210,7 +210,7 @@ weighted_summary_means <- function(y_wobs_test, family, wdraws, mu, dis, cl_ref,
 
   ## fetch the mu and lppd for the baseline model
   summaries_baseline <- summaries_ref
-  delta <- !is.null(summaries_ref) # TODO: Does this work?
+  delta <- !is.null(summaries_ref) # TODO: I think this will always give `delta = TRUE`.
 
   for (s in seq_along(stats)) {
     stat <- stats[s]
