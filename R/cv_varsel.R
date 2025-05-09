@@ -999,10 +999,9 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
           refmodel = refmodel, ndraws = ndraws, nclusters = nclusters,
           reweighting_args = list(cl_ref = cl_sel, wdraws_ref = exp(lw[, i])),
           method = method, nterms_max = nterms_max, penalty = penalty,
-          verbose = verbose_obs,
-          verbose_txt_obs = vtxt_obs_i,
-          search_control = search_control,
-          search_terms = search_terms, est_runtime = FALSE, ...
+          verbose = verbose_obs, verbose_txt_obs = vtxt_obs_i,
+          search_control = search_control, search_terms = search_terms,
+          est_runtime = FALSE, ...
         )
       }
 
@@ -1012,8 +1011,8 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
         search_path = search_path, refmodel = refmodel, refit_prj = refit_prj,
         ndraws = ndraws_pred, nclusters = nclusters_pred,
         reweighting_args = list(cl_ref = cl_pred, wdraws_ref = exp(lw[, i])),
-        indices_test = i, verbose = verbose_obs,
-        verbose_txt_obs = vtxt_obs_i, ...
+        indices_test = i, verbose = verbose_obs, verbose_txt_obs = vtxt_obs_i,
+        ...
       )
 
       return(nlist(predictor_ranking = search_path[["predictor_ranking"]],
@@ -1373,10 +1372,9 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
       search_path <- .select(
         refmodel = fold$refmodel, ndraws = ndraws, nclusters = nclusters,
         method = method, nterms_max = nterms_max, penalty = penalty,
-        verbose = verbose_fold,
-        verbose_txt_obs = vtxt_fold_k,
-        search_control = search_control,
-        search_terms = search_terms, est_runtime = FALSE, ...
+        verbose = verbose_fold, verbose_txt_obs = vtxt_fold_k,
+        search_control = search_control, search_terms = search_terms,
+        est_runtime = FALSE, ...
       )
     }
 
