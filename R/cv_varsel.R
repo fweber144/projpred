@@ -955,14 +955,14 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
 
     if (verbose) {
       if (refit_prj) {
-        verb_clust_used_eval <- refdist_pred[["clust_used"]]
-        verb_nprjdraws_eval <- refdist_pred[["nprjdraws"]]
+        vtxt_clust_used_eval <- refdist_pred[["clust_used"]]
+        vtxt_nprjdraws_eval <- refdist_pred[["nprjdraws"]]
       } else {
         # NOTE: `!refit_prj` cannot occur in combination with
         # `!search_out_rks_was_null`, so it is correct and safe to use
         # `refdist_sel` here.
-        verb_clust_used_eval <- refdist_sel[["clust_used"]]
-        verb_nprjdraws_eval <- refdist_sel[["nprjdraws"]]
+        vtxt_clust_used_eval <- refdist_sel[["clust_used"]]
+        vtxt_nprjdraws_eval <- refdist_sel[["nprjdraws"]]
       }
       verb_out("-----\nRunning ",
                if (!search_out_rks_was_null) {
@@ -974,7 +974,7 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
                         " and ")
                },
                "the performance evaluation with ",
-               txt_clust_draws(verb_clust_used_eval, verb_nprjdraws_eval),
+               txt_clust_draws(vtxt_clust_used_eval, vtxt_nprjdraws_eval),
                " (`refit_prj = ", refit_prj, "`) for each of the `nloo = ",
                nloo, "` LOO-CV folds separately ...")
     }
@@ -986,7 +986,7 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
       i <- inds[run_index]
 
       # For (extra-)verbose mode:
-      verb_obs_i <- paste0("for observation ", i, " ")
+      vtxt_obs_i <- paste0("for observation ", i, " ")
 
       # Run the search with the reweighted clusters (or thinned draws) (so the
       # *reweighted* fitted response values from the reference model act as
@@ -1000,7 +1000,7 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
           reweighting_args = list(cl_ref = cl_sel, wdraws_ref = exp(lw[, i])),
           method = method, nterms_max = nterms_max, penalty = penalty,
           verbose = verbose_obs,
-          verbose_txt_obs = verb_obs_i,
+          verbose_txt_obs = vtxt_obs_i,
           search_control = search_control,
           search_terms = search_terms, est_runtime = FALSE, ...
         )
@@ -1013,7 +1013,7 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
         ndraws = ndraws_pred, nclusters = nclusters_pred,
         reweighting_args = list(cl_ref = cl_pred, wdraws_ref = exp(lw[, i])),
         indices_test = i, verbose = verbose_obs,
-        verbose_txt_obs = verb_obs_i, ...
+        verbose_txt_obs = vtxt_obs_i, ...
       )
 
       return(nlist(predictor_ranking = search_path[["predictor_ranking"]],
@@ -1325,33 +1325,33 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
       nclusters = nclusters,
       S = length(refmodel$wdraws_ref)
     )
-    verb_clust_used_sel <- clust_info_sel[["clust_used"]]
-    verb_nprjdraws_sel <- clust_info_sel[["nprjdraws"]]
+    vtxt_clust_used_sel <- clust_info_sel[["clust_used"]]
+    vtxt_nprjdraws_sel <- clust_info_sel[["nprjdraws"]]
     if (refit_prj) {
       clust_info_eval <- clust_info(
         ndraws = ndraws_pred,
         nclusters = nclusters_pred,
         S = length(refmodel$wdraws_ref)
       )
-      verb_clust_used_eval <- clust_info_eval[["clust_used"]]
-      verb_nprjdraws_eval <- clust_info_eval[["nprjdraws"]]
+      vtxt_clust_used_eval <- clust_info_eval[["clust_used"]]
+      vtxt_nprjdraws_eval <- clust_info_eval[["nprjdraws"]]
     } else {
       # NOTE: `!refit_prj` cannot occur in combination with
       # `!search_out_rks_was_null || !validate_search`, so it is correct and
-      # safe to use `verb_clust_used_sel` and `verb_nprjdraws_sel` here.
-      verb_clust_used_eval <- verb_clust_used_sel
-      verb_nprjdraws_eval <- verb_nprjdraws_sel
+      # safe to use `vtxt_clust_used_sel` and `vtxt_nprjdraws_sel` here.
+      vtxt_clust_used_eval <- vtxt_clust_used_sel
+      vtxt_nprjdraws_eval <- vtxt_nprjdraws_sel
     }
     verb_out("-----\nRunning ",
              if (!search_out_rks_was_null || !validate_search) {
                ""
              } else {
                paste0(method, " search with ",
-                      txt_clust_draws(verb_clust_used_sel, verb_nprjdraws_sel),
+                      txt_clust_draws(vtxt_clust_used_sel, vtxt_nprjdraws_sel),
                       " and ")
              },
              "the performance evaluation with ",
-             txt_clust_draws(verb_clust_used_eval, verb_nprjdraws_eval),
+             txt_clust_draws(vtxt_clust_used_eval, vtxt_nprjdraws_eval),
              " (`refit_prj = ", refit_prj, "`) for each of the K = ", K,
              " CV folds separately ...")
   }
@@ -1362,7 +1362,7 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
                          getOption("projpred.extra_verbose", FALSE),
                        ...) {
     # For (extra-)verbose mode:
-    verb_fold_k <- paste0("for fold ", k, " ")
+    vtxt_fold_k <- paste0("for fold ", k, " ")
 
     # Run the search for the current fold:
     if (!validate_search) {
@@ -1374,7 +1374,7 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
         refmodel = fold$refmodel, ndraws = ndraws, nclusters = nclusters,
         method = method, nterms_max = nterms_max, penalty = penalty,
         verbose = verbose_fold,
-        verbose_txt_obs = verb_fold_k,
+        verbose_txt_obs = vtxt_fold_k,
         search_control = search_control,
         search_terms = search_terms, est_runtime = FALSE, ...
       )
@@ -1386,7 +1386,7 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
       search_path = search_path, refmodel = fold$refmodel,
       refit_prj = refit_prj, ndraws = ndraws_pred, nclusters = nclusters_pred,
       refmodel_fulldata = refmodel, indices_test = fold$omitted,
-      verbose = verbose_fold, verbose_txt_obs = verb_fold_k, ...
+      verbose = verbose_fold, verbose_txt_obs = vtxt_fold_k, ...
     )
 
     # Performance evaluation for the reference model of the current fold:
