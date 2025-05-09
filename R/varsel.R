@@ -88,8 +88,13 @@
 #'   default `search_terms` considers all the terms in the reference model's
 #'   formula.
 #' @param search_out Intended for internal use.
-#' @param verbose A single logical value indicating whether to print out
-#'   additional information during the computations.
+#' @param verbose A single integer value from the set \eqn{\{0, 1, 2, 3,
+#'   4\}}{{0, 1, 2, 3, 4}} (for [varsel()], \eqn{3} and \eqn{4} have the same
+#'   effect), indicating how much information (if any) to print out during the
+#'   computations. Higher values indicate that more information should be
+#'   printed, `0` deactivates the verbose mode. Internally, argument `verbose`
+#'   is coerced to integer via `as.integer()`, so technically, a single logical
+#'   value or a single numeric value work as well.
 #' @param seed Pseudorandom number generation (PRNG) seed by which the same
 #'   results can be obtained again if needed. Passed to argument `seed` of
 #'   [set.seed()], but can also be `NA` to not call [set.seed()] at all. If not
@@ -258,7 +263,7 @@ varsel.refmodel <- function(
     nclusters_pred = NULL,
     refit_prj = !inherits(object, "datafit"),
     nterms_max = NULL,
-    verbose = getOption("projpred.verbose", interactive()),
+    verbose = getOption("projpred.verbose", as.integer(interactive())),
     search_control = NULL,
     lambda_min_ratio = 1e-5,
     nlambda = 150,
@@ -307,7 +312,7 @@ varsel.refmodel <- function(
   args <- parse_args_varsel(
     refmodel = refmodel, method = method, refit_prj = refit_prj,
     nterms_max = nterms_max, nclusters = nclusters, search_terms = search_terms,
-    nterms_all = nterms_all
+    nterms_all = nterms_all, verbose = verbose
   )
   method <- args$method
   refit_prj <- args$refit_prj
@@ -315,6 +320,7 @@ varsel.refmodel <- function(
   nclusters <- args$nclusters
   search_terms <- args$search_terms
   search_terms_was_null <- args$search_terms_was_null
+  verbose <- args$verbose
 
   # Pre-process `d_test`:
   if (is.null(d_test)) {
@@ -566,7 +572,7 @@ varsel.refmodel <- function(
 # them in with the default values. The purpose of this function is to avoid
 # repeating the same code both in varsel() and cv_varsel().
 parse_args_varsel <- function(refmodel, method, refit_prj, nterms_max,
-                              nclusters, search_terms, nterms_all) {
+                              nclusters, search_terms, nterms_all, verbose) {
   search_terms_was_null <- is.null(search_terms)
   if (search_terms_was_null) {
     search_terms <- split_formula(refmodel$formula,
@@ -648,6 +654,28 @@ parse_args_varsel <- function(refmodel, method, refit_prj, nterms_max,
     )
   }
 
+  verbose <- as.integer(verbose)
+  if (!is.null(getOption("projpred.extra_verbose"))) {
+    warning(
+      "Global option `projpred.extra_verbose` is deprecated. Please use ",
+      "argument `verbose` instead. This argument can also be controlled via a ",
+      "corresponding global option. Now trying to find an appropriate value ",
+      "for argument `verbose`."
+    )
+    verbose <- (as.integer(getOption("projpred.extra_verbose")) + 1L) *
+      as.logical(verbose)
+  }
+  if (!is.null(getOption("projpred.verbose_project"))) {
+    warning(
+      "Global option `projpred.verbose_project` is deprecated. Please use ",
+      "argument `verbose` instead. This argument can also be controlled via a ",
+      "corresponding global option. Now trying to find an appropriate value ",
+      "for argument `verbose`."
+    )
+    verbose <- (as.integer(getOption("projpred.verbose_project")) + 3L) *
+      as.logical(verbose)
+  }
+
   return(nlist(method, refit_prj, nterms_max, nclusters, search_terms,
-               search_terms_was_null))
+               search_terms_was_null, verbose))
 }
