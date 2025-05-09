@@ -979,7 +979,7 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
                nloo, "` LOO-CV folds separately ...")
     }
     one_obs <- function(run_index,
-                        verbose_search = verbose &&
+                        verbose_obs = verbose &&
                           getOption("projpred.extra_verbose", FALSE),
                         ...) {
       # Observation index:
@@ -999,7 +999,7 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
           refmodel = refmodel, ndraws = ndraws, nclusters = nclusters,
           reweighting_args = list(cl_ref = cl_sel, wdraws_ref = exp(lw[, i])),
           method = method, nterms_max = nterms_max, penalty = penalty,
-          verbose = verbose_search,
+          verbose = verbose_obs,
           verbose_txt_obs = verb_obs_i,
           search_control = search_control,
           search_terms = search_terms, est_runtime = FALSE, ...
@@ -1012,7 +1012,7 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
         search_path = search_path, refmodel = refmodel, refit_prj = refit_prj,
         ndraws = ndraws_pred, nclusters = nclusters_pred,
         reweighting_args = list(cl_ref = cl_pred, wdraws_ref = exp(lw[, i])),
-        indices_test = i, verbose = verbose_search,
+        indices_test = i, verbose = verbose_obs,
         verbose_txt_obs = verb_obs_i, ...
       )
 
@@ -1064,7 +1064,7 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
                       "loo_sub_oscale", "mu_sub_oscale")
       ) %do_projpred% {
         out_one_obs <- do.call(one_obs, c(list(run_index = run_index,
-                                               verbose_search = FALSE),
+                                               verbose_obs = FALSE),
                                           dot_args))
         if (!is.null(progressor_obj)) progressor_obj()
         return(out_one_obs)
@@ -1358,7 +1358,7 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
   one_fold <- function(fold,
                        rk,
                        k,
-                       verbose_search = verbose &&
+                       verbose_fold = verbose &&
                          getOption("projpred.extra_verbose", FALSE),
                        ...) {
     # For (extra-)verbose mode:
@@ -1373,7 +1373,7 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
       search_path <- .select(
         refmodel = fold$refmodel, ndraws = ndraws, nclusters = nclusters,
         method = method, nterms_max = nterms_max, penalty = penalty,
-        verbose = verbose_search,
+        verbose = verbose_fold,
         verbose_txt_obs = verb_fold_k,
         search_control = search_control,
         search_terms = search_terms, est_runtime = FALSE, ...
@@ -1386,7 +1386,7 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
       search_path = search_path, refmodel = fold$refmodel,
       refit_prj = refit_prj, ndraws = ndraws_pred, nclusters = nclusters_pred,
       refmodel_fulldata = refmodel, indices_test = fold$omitted,
-      verbose = verbose_search, verbose_txt_obs = verb_fold_k, ...
+      verbose = verbose_fold, verbose_txt_obs = verb_fold_k, ...
     )
 
     # Performance evaluation for the reference model of the current fold:
@@ -1454,7 +1454,7 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
       out_one_fold <- do_call(one_fold, c(list(fold = list_cv_k,
                                                rk = search_out_rks_k,
                                                k = ks_k,
-                                               verbose_search = FALSE),
+                                               verbose_fold = FALSE),
                                           dot_args))
       if (!is.null(progressor_obj)) progressor_obj()
       return(out_one_fold)
