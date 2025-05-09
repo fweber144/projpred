@@ -1,4 +1,4 @@
-search_forward <- function(p_ref, refmodel, nterms_max, verbose = TRUE,
+search_forward <- function(p_ref, refmodel, nterms_max, verbose = 1L,
                            search_terms, est_runtime = TRUE,
                            search_terms_was_null, ...) {
   nterms_max_with_icpt <- nterms_max + 1L
@@ -23,7 +23,8 @@ search_forward <- function(p_ref, refmodel, nterms_max, verbose = TRUE,
       time_bef <- Sys.time()
     }
     submodls <- lapply(full_cands, proj_to_submodl, p_ref = p_ref,
-                       refmodel = refmodel, ...)
+                       refmodel = refmodel, verbose_prj_fml = verbose >= 2L,
+                       ...)
     if (size == 1 && est_runtime && getOption("projpred.mssg_time", TRUE)) {
       time_aft <- Sys.time()
       dtime <- difftime(time_aft, time_bef, units = "secs")
@@ -118,9 +119,9 @@ search_forward <- function(p_ref, refmodel, nterms_max, verbose = TRUE,
 
     # Verbose mode output:
     ct_chosen <- count_terms_chosen(chosen)
-    if (verbose && ct_chosen %in% iq) {
+    if (verbose >= 1L && ct_chosen %in% iq) {
       vtxt <- paste(names(iq)[max(which(ct_chosen == iq))], "of terms selected")
-      if (getOption("projpred.extra_verbose", FALSE)) {
+      if (verbose >= 2L) {
         vtxt <- paste0(vtxt, ": ", paste(chosen, collapse = " + "))
       }
       verb_out(vtxt)

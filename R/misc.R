@@ -637,8 +637,8 @@ cat_cls <- function(x) {
 }
 
 # Print out text via cat() if `verbose = TRUE`:
-verb_out <- function(..., verbose = TRUE) {
-  if (verbose) {
+verb_out <- function(..., verbose = 1L) {
+  if (verbose >= 1L) {
     cat(..., "\n", sep = "")
   }
 }

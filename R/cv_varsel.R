@@ -271,7 +271,7 @@ cv_varsel.refmodel <- function(
     refit_prj = !inherits(object, "datafit"),
     nterms_max = NULL,
     penalty = NULL,
-    verbose = getOption("projpred.verbose", interactive()),
+    verbose = getOption("projpred.verbose", as.integer(interactive())),
     nloo = if (cv_method == "LOO") object$nobs else NULL,
     K = if (!inherits(object, "datafit")) 5 else 10,
     cvfits = object$cvfits,
@@ -953,7 +953,8 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
     }
     cl_pred <- refdist_pred$cl
 
-    if (verbose) {
+    verbose_cv_section <- verbose >= 1L
+    if (verbose_cv_section) {
       if (refit_prj) {
         vtxt_clust_used_eval <- refdist_pred[["clust_used"]]
         vtxt_nprjdraws_eval <- refdist_pred[["nprjdraws"]]
@@ -979,13 +980,12 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
                nloo, "` LOO-CV folds separately ...")
     }
     one_obs <- function(run_index,
-                        verbose_obs = verbose &&
-                          getOption("projpred.extra_verbose", FALSE),
+                        verbose_obs = max(verbose - 1L, 0L),
                         ...) {
       # Observation index:
       i <- inds[run_index]
 
-      # For (extra-)verbose mode:
+      # For `verbose_obs >= 1L`:
       vtxt_obs_i <- paste0("for observation ", i, " ")
 
       # Run the search with the reweighted clusters (or thinned draws) (so the
@@ -1020,22 +1020,23 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
                    clust_used_eval = perf_eval_out[["clust_used"]],
                    nprjdraws_eval = perf_eval_out[["nprjdraws"]]))
     }
+    verbose_progress <- verbose >= 1L
     if (!parallel) {
       # Sequential case. Actually, we could simply use ``%do_projpred%` <-
       # foreach::`%do%`` here and then proceed as in the parallel case, but that
       # would require adding more "hard" dependencies (because packages
       # 'foreach' and 'doRNG' would have to be moved from `Suggests:` to
       # `Imports:`).
-      if (verbose) {
+      if (verbose_progress) {
         pb <- utils::txtProgressBar(min = 0, max = nloo, style = 3, initial = 0)
       }
       res_cv <- lapply(seq_along(inds), function(run_index) {
-        if (verbose) {
+        if (verbose_progress) {
           on.exit(utils::setTxtProgressBar(pb, run_index))
         }
         one_obs(run_index, ...)
       })
-      if (verbose) {
+      if (verbose_progress) {
         close(pb)
       }
     } else {
@@ -1046,7 +1047,7 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
       if (!requireNamespace("doRNG", quietly = TRUE)) {
         stop("Please install the 'doRNG' package.")
       }
-      if (verbose && use_progressr()) {
+      if (verbose_progress && use_progressr()) {
         progressor_obj <- progressr::progressor(length(inds))
       } else {
         progressor_obj <- NULL
@@ -1063,7 +1064,7 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
                       "loo_sub_oscale", "mu_sub_oscale")
       ) %do_projpred% {
         out_one_obs <- do.call(one_obs, c(list(run_index = run_index,
-                                               verbose_obs = FALSE),
+                                               verbose_obs = 0L),
                                           dot_args))
         if (!is.null(progressor_obj)) progressor_obj()
         return(out_one_obs)
@@ -1122,7 +1123,7 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
                             nprjdraws_eval))
       }
     }
-    verb_out("-----", verbose = verbose)
+    verb_out("-----", verbose = as.integer(verbose_cv_section))
   }
 
   ## Post-processing --------------------------------------------------------
@@ -1316,7 +1317,8 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
   }
   y_wobs_test <- as.data.frame(refmodel[nms_y_wobs_test()])
 
-  if (verbose) {
+  verbose_cv_section <- verbose >= 1L
+  if (verbose_cv_section) {
     # Here in kfold_varsel(), we have no get_refdist() (or get_p_clust()) output
     # available, so use clust_info() as a workaround:
     clust_info_sel <- clust_info(
@@ -1357,10 +1359,9 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
   one_fold <- function(fold,
                        rk,
                        k,
-                       verbose_fold = verbose &&
-                         getOption("projpred.extra_verbose", FALSE),
+                       verbose_fold = max(verbose - 1L, 0L),
                        ...) {
-    # For (extra-)verbose mode:
+    # For `verbose_fold >= 1L`:
     vtxt_fold_k <- paste0("for fold ", k, " ")
 
     # Run the search for the current fold:
@@ -1408,21 +1409,22 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
                  summaries_ref, clust_used_eval = perf_eval_out[["clust_used"]],
                  nprjdraws_eval = perf_eval_out[["nprjdraws"]]))
   }
+  verbose_progress <- verbose >= 1L
   if (!parallel) {
     # Sequential case. Actually, we could simply use ``%do_projpred%` <-
     # foreach::`%do%`` here and then proceed as in the parallel case, but that
     # would require adding more "hard" dependencies (because packages 'foreach'
     # and 'doRNG' would have to be moved from `Suggests:` to `Imports:`).
-    if (verbose) {
+    if (verbose_progress) {
       pb <- utils::txtProgressBar(min = 0, max = K, style = 3, initial = 0)
     }
     res_cv <- lapply(seq_len(K), function(k) {
-      if (verbose) {
+      if (verbose_progress) {
         on.exit(utils::setTxtProgressBar(pb, k))
       }
       one_fold(fold = list_cv[[k]], rk = search_out_rks[[k]], k = k, ...)
     })
-    if (verbose) {
+    if (verbose_progress) {
       close(pb)
     }
   } else {
@@ -1433,7 +1435,7 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
     if (!requireNamespace("doRNG", quietly = TRUE)) {
       stop("Please install the 'doRNG' package.")
     }
-    if (verbose && use_progressr()) {
+    if (verbose_progress && use_progressr()) {
       progressor_obj <- progressr::progressor(K)
     } else {
       progressor_obj <- NULL
@@ -1452,13 +1454,13 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
       out_one_fold <- do_call(one_fold, c(list(fold = list_cv_k,
                                                rk = search_out_rks_k,
                                                k = ks_k,
-                                               verbose_fold = FALSE),
+                                               verbose_fold = 0L),
                                           dot_args))
       if (!is.null(progressor_obj)) progressor_obj()
       return(out_one_fold)
     }
   }
-  verb_out("-----", verbose = verbose)
+  verb_out("-----", verbose = as.integer(verbose_cv_section))
   predictor_ranking_cv <- do.call(rbind,
                                   lapply(res_cv, "[[", "predictor_ranking"))
   clust_used_eval <- element_unq(res_cv, nm = "clust_used_eval")
@@ -1531,7 +1533,7 @@ get_kfold <- function(refmodel, K, cvfits, verbose) {
   if (is.null(cvfits)) {
     if (!is.null(refmodel$cvfun)) {
       # In this case, cvfun() provided (and `cvfits` not), so run cvfun() now.
-      if (verbose && !inherits(refmodel, "datafit")) {
+      if (verbose >= 1L && !inherits(refmodel, "datafit")) {
         verb_out("-----\nRefitting the reference model K = ", K, " times ",
                  "(using the fold-wise training data) ...")
       }
