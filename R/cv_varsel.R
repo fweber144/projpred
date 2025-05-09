@@ -985,6 +985,9 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
       # Observation index:
       i <- inds[run_index]
 
+      # For (extra-)verbose mode:
+      verb_obs_i <- paste0("for observation ", i, " ")
+
       # Run the search with the reweighted clusters (or thinned draws) (so the
       # *reweighted* fitted response values from the reference model act as
       # artifical response values in the projection (or L1-penalized
@@ -997,16 +1000,7 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
           reweighting_args = list(cl_ref = cl_sel, wdraws_ref = exp(lw[, i])),
           method = method, nterms_max = nterms_max, penalty = penalty,
           verbose = verbose_search,
-          verbose_txt_obs = NULL,
-          # TODO: Use a non-`NULL` text for `verbose_txt_obs` mentioning that
-          # this is for a single fold, namely fold `i`, and also remove the
-          # possibility of `verbose_txt_obs = NULL` in .select() (and then also
-          # remove `May also be `NULL` to omit that verbose message completely.`
-          # in the corresponding internal documentation). Then also set `verbose
-          # = verbose_search` in the perf_eval() call below and rename
-          # `verbose_search` to something like `verbose_folds` (and don't forget
-          # to update the general package documentation for global option
-          # `projpred.extra_verbose`).
+          verbose_txt_obs = verb_obs_i,
           search_control = search_control,
           search_terms = search_terms, est_runtime = FALSE, ...
         )
@@ -1018,7 +1012,8 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
         search_path = search_path, refmodel = refmodel, refit_prj = refit_prj,
         ndraws = ndraws_pred, nclusters = nclusters_pred,
         reweighting_args = list(cl_ref = cl_pred, wdraws_ref = exp(lw[, i])),
-        indices_test = i, ...
+        indices_test = i, verbose = verbose_search,
+        verbose_txt_obs = verb_obs_i, ...
       )
 
       return(nlist(predictor_ranking = search_path[["predictor_ranking"]],
@@ -1293,6 +1288,7 @@ warn_pareto <- function(n07, n, khat_threshold = 0.7, warn_txt) {
 if (getRversion() >= package_version("2.15.1")) {
   utils::globalVariables("list_cv_k")
   utils::globalVariables("search_out_rks_k")
+  utils::globalVariables("ks_k")
 }
 
 kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
@@ -1361,9 +1357,13 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
   }
   one_fold <- function(fold,
                        rk,
+                       k,
                        verbose_search = verbose &&
                          getOption("projpred.extra_verbose", FALSE),
                        ...) {
+    # For (extra-)verbose mode:
+    verb_fold_k <- paste0("for fold ", k, " ")
+
     # Run the search for the current fold:
     if (!validate_search) {
       search_path <- search_path_fulldata
@@ -1374,13 +1374,7 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
         refmodel = fold$refmodel, ndraws = ndraws, nclusters = nclusters,
         method = method, nterms_max = nterms_max, penalty = penalty,
         verbose = verbose_search,
-        verbose_txt_obs = NULL,
-        # TODO: When using a non-`NULL` text for `verbose_txt_obs` in one_obs(),
-        # also do this here in one_fold(). Then also set `verbose =
-        # verbose_search` in the perf_eval() call below and rename
-        # `verbose_search` to something like `verbose_folds` (and don't forget
-        # to update the general package documentation for global option
-        # `projpred.extra_verbose`).
+        verbose_txt_obs = verb_fold_k,
         search_control = search_control,
         search_terms = search_terms, est_runtime = FALSE, ...
       )
@@ -1391,7 +1385,8 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
     perf_eval_out <- perf_eval(
       search_path = search_path, refmodel = fold$refmodel,
       refit_prj = refit_prj, ndraws = ndraws_pred, nclusters = nclusters_pred,
-      refmodel_fulldata = refmodel, indices_test = fold$omitted, ...
+      refmodel_fulldata = refmodel, indices_test = fold$omitted,
+      verbose = verbose_search, verbose_txt_obs = verb_fold_k, ...
     )
 
     # Performance evaluation for the reference model of the current fold:
@@ -1423,11 +1418,11 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
     if (verbose) {
       pb <- utils::txtProgressBar(min = 0, max = K, style = 3, initial = 0)
     }
-    res_cv <- lapply(seq_along(list_cv), function(k) {
+    res_cv <- lapply(seq_len(K), function(k) {
       if (verbose) {
         on.exit(utils::setTxtProgressBar(pb, k))
       }
-      one_fold(fold = list_cv[[k]], rk = search_out_rks[[k]], ...)
+      one_fold(fold = list_cv[[k]], rk = search_out_rks[[k]], k = k, ...)
     })
     if (verbose) {
       close(pb)
@@ -1441,7 +1436,7 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
       stop("Please install the 'doRNG' package.")
     }
     if (verbose && use_progressr()) {
-      progressor_obj <- progressr::progressor(length(list_cv))
+      progressor_obj <- progressr::progressor(K)
     } else {
       progressor_obj <- NULL
     }
@@ -1450,6 +1445,7 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
     res_cv <- foreach::foreach(
       list_cv_k = list_cv,
       search_out_rks_k = search_out_rks,
+      ks_k = seq_len(K),
       .packages = c("projpred"),
       .export = c("one_fold", "dot_args", "progressor_obj",
                   getOption("projpred.export_to_workers", character())),
@@ -1457,6 +1453,7 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
     ) %do_projpred% {
       out_one_fold <- do_call(one_fold, c(list(fold = list_cv_k,
                                                rk = search_out_rks_k,
+                                               k = ks_k,
                                                verbose_search = FALSE),
                                           dot_args))
       if (!is.null(progressor_obj)) progressor_obj()
