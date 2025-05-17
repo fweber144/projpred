@@ -359,7 +359,7 @@ cv_varsel.refmodel <- function(
       # NOTE: If `!validate_search`, this is still a full-data search, but in
       # that case, there are no fold-wise searches, so declaring this as a
       # full-data search could be confusing:
-      verbose_txt_obs = if (validate_search) "using the full dataset " else "",
+      verbose_txt_add = if (validate_search) "using the full dataset " else "",
       search_control = search_control, search_terms = search_terms,
       search_terms_was_null = search_terms_was_null, ...
     )
@@ -406,7 +406,7 @@ cv_varsel.refmodel <- function(
         ndraws = ndraws, nclusters = nclusters, ndraws_pred = ndraws_pred,
         nclusters_pred = nclusters_pred, refit_prj = refit_prj, penalty = penalty,
         verbose = if (verbose >= 2L) verbose - 1L else verbose,
-        verbose_txt_obs = "using the full dataset ",
+        verbose_txt_add = "using the full dataset ",
         search_control = search_control,
         nloo = refmodel$nobs,    # fast LOO-CV (using all observations)
         validate_search = FALSE, # fast LOO-CV (using all observations)
@@ -1014,7 +1014,7 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
           reweighting_args = list(cl_ref = cl_sel, wdraws_ref = exp(lw[, i])),
           method = method, nterms_max = nterms_max, penalty = penalty,
           verbose = verbose_obs, verbose_line_length = 3,
-          verbose_txt_obs = vtxt_obs_i, search_control = search_control,
+          verbose_txt_add = vtxt_obs_i, search_control = search_control,
           search_terms = search_terms, est_runtime = FALSE, ...
         )
       }
@@ -1026,7 +1026,7 @@ loo_varsel <- function(refmodel, method, nterms_max, ndraws,
         ndraws = ndraws_pred, nclusters = nclusters_pred,
         reweighting_args = list(cl_ref = cl_pred, wdraws_ref = exp(lw[, i])),
         indices_test = i, verbose = verbose_obs, verbose_line_length = 3,
-        verbose_txt_obs = vtxt_obs_i, ...
+        verbose_txt_add = vtxt_obs_i, ...
       )
 
       return(nlist(predictor_ranking = search_path[["predictor_ranking"]],
@@ -1387,7 +1387,7 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
         refmodel = fold$refmodel, ndraws = ndraws, nclusters = nclusters,
         method = method, nterms_max = nterms_max, penalty = penalty,
         verbose = verbose_fold, verbose_line_length = 3,
-        verbose_txt_obs = vtxt_fold_k, search_control = search_control,
+        verbose_txt_add = vtxt_fold_k, search_control = search_control,
         search_terms = search_terms, est_runtime = FALSE, ...
       )
     }
@@ -1399,7 +1399,7 @@ kfold_varsel <- function(refmodel, method, nterms_max, ndraws, nclusters,
       refit_prj = refit_prj, ndraws = ndraws_pred, nclusters = nclusters_pred,
       refmodel_fulldata = refmodel, indices_test = fold$omitted,
       verbose = verbose_fold, verbose_line_length = 3,
-      verbose_txt_obs = vtxt_fold_k, ...
+      verbose_txt_add = vtxt_fold_k, ...
     )
 
     # Performance evaluation for the reference model of the current fold:
