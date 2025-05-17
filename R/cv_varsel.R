@@ -406,6 +406,7 @@ cv_varsel.refmodel <- function(
         ndraws = ndraws, nclusters = nclusters, ndraws_pred = ndraws_pred,
         nclusters_pred = nclusters_pred, refit_prj = refit_prj, penalty = penalty,
         verbose = if (verbose >= 2L) verbose - 1L else verbose,
+        verbose_txt_obs = "using the full dataset ",
         search_control = search_control,
         nloo = refmodel$nobs,    # fast LOO-CV (using all observations)
         validate_search = FALSE, # fast LOO-CV (using all observations)
