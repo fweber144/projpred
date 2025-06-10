@@ -985,8 +985,8 @@ cumulate_tst <- as.list(setNames(nm = c(FALSE, TRUE)))
 names(cumulate_tst) <- paste0("cu", names(cumulate_tst))
 
 angle_tst <- list(
-  default_angle = list(),
-  angle45 = list(text_angle = 45)
+  angle45 = list(),
+  angle0 = list(text_angle = 0)
 )
 
 deltas_tst_plot <- list(

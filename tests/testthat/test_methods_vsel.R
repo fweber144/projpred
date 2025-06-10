@@ -444,7 +444,7 @@ test_that(paste(
   skip_if_not(run_vs)
   tstsetups <- grep(paste("\\.default_nterms_max_smmry", "\\.default_rk_max",
                           "\\.default_abbv", "\\.default_repel", "\\.colFALSE",
-                          "\\.cuFALSE", "\\.default_angle", sep = ".*"),
+                          "\\.cuFALSE", "\\.angle45", sep = ".*"),
                     names(plots_vs), value = TRUE)
   for (tstsetup in tstsetups) {
     args_plot_i <- args_plot_vs[[tstsetup]]
@@ -478,7 +478,7 @@ test_that(paste(
   skip_if_not(run_cvvs)
   tstsetups <- grep(paste("\\.default_nterms_max_smmry", "\\.default_rk_max",
                           "\\.default_abbv", "\\.default_repel", "\\.colFALSE",
-                          "\\.cuFALSE", "\\.default_angle", sep = ".*"),
+                          "\\.cuFALSE", "\\.angle45", sep = ".*"),
                     names(plots_cvvs), value = TRUE)
   for (tstsetup in tstsetups) {
     args_plot_i <- args_plot_cvvs[[tstsetup]]
