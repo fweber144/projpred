@@ -1876,6 +1876,7 @@ cre_args_plot_vsel <- function(args_obj) {
                         list(nterms_max = nterms_crr),
                         rk_max_crr, rk_abbv_crr, rk_repel_crr,
                         list(ranking_colored = rk_col_crr,
+                             show_cv_proportions = TRUE,
                              cumulate = cumulate_crr),
                         angle_crr,
                         deltas_crr
