@@ -660,7 +660,8 @@ proj_predict_aux <- function(proj, newdata, offsetnew, weightsnew,
 #'   `nterms_max`), `text_angle = 45` might be helpful (for example). If
 #'   `text_angle > 0` (`< 0`), the x-axis text is automatically right-aligned
 #'   (left-aligned). If `-90 < text_angle && text_angle < 90 && text_angle !=
-#'   0`, the x-axis text is also top-aligned.
+#'   0`, the x-axis text is also top-aligned. The default of argument `angle` in
+#'   [ggplot2::element_text()] is `NULL`, which implies no rotation.
 #' @param size_position A single character string specifying the position of the
 #'   submodel sizes. Either `"primary_x_bottom"` for including them in the
 #'   x-axis tick labels, `"primary_x_top"` for putting them above the x-axis, or
