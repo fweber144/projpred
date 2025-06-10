@@ -665,9 +665,10 @@ proj_predict_aux <- function(proj, newdata, offsetnew, weightsnew,
 #' @param size_position A single character string specifying the position of the
 #'   submodel sizes. Either `"primary_x_bottom"` for including them in the
 #'   x-axis tick labels, `"primary_x_top"` for putting them above the x-axis, or
-#'   `"secondary_x"` for putting them into a secondary x-axis. Currently, both
-#'   of the non-default options may not be combined with `ranking_nterms_max =
-#'   NA`.
+#'   `"secondary_x"` for putting them into a secondary x-axis. Currently,
+#'   `"primary_x_top"` and `"secondary_x"` may not be combined with
+#'   `ranking_nterms_max = NA` (i.e., only `"primary_x_bottom"` works with
+#'   `ranking_nterms_max = NA`).
 #'
 #' @inherit summary.vsel details
 #'
