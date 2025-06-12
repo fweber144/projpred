@@ -1832,7 +1832,11 @@ cre_args_plot_vsel <- function(args_obj) {
     tstsetups,
     head(grep("\\.spclformul", names(args_obj), value = TRUE), 1)
   )
-  lapply(
+  tstsetups <- union(
+    tstsetups,
+    grep("\\.cumul", names(args_obj), value = TRUE)
+  )
+  args_out <- lapply(
     setNames(nm = tstsetups),
     function(tstsetup_vsel) {
       mod_crr <- args_obj[[tstsetup_vsel]]$mod_nm
@@ -1884,14 +1888,27 @@ cre_args_plot_vsel <- function(args_obj) {
           })
         })
       })
-    })
+    }
+  )
+  args_out <- unlist_cust(args_out)
+  args_out <- args_out[c(
+    grep("\\.cumul|\\.empty_size", names(args_out), value = TRUE),
+    do.call(c, lapply(
+      grep("\\.cumul|\\.empty_size", tstsetups, value = TRUE, invert = TRUE),
+      function(tstsetup) {
+        head(
+          grep(gsub("\\.", "\\\\.", tstsetup), names(args_out), value = TRUE),
+          1
+        )
+      }
+    ))
+  )]
 }
 
 ### varsel() --------------------------------------------------------------
 
 if (run_vs) {
   args_plot_vs <- cre_args_plot_vsel(args_vs)
-  args_plot_vs <- unlist_cust(args_plot_vs)
 
   plots_vs <- lapply(args_plot_vs, function(args_plot_vs_i) {
     do.call(plot, c(
@@ -1905,7 +1922,6 @@ if (run_vs) {
 
 if (run_cvvs) {
   args_plot_cvvs <- cre_args_plot_vsel(args_cvvs)
-  args_plot_cvvs <- unlist_cust(args_plot_cvvs)
 
   plots_cvvs <- lapply(args_plot_cvvs, function(args_plot_cvvs_i) {
     do.call(plot, c(
