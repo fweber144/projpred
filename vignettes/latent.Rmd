@@ -55,7 +55,7 @@ In the post-processing functions, response-scale analyses can usually be deactiv
 
 Apart from the arguments mentioned above, `extend_family()` has also gained a new argument `latent_y_unqs` whose purpose is described in the documentation.
 
-While the latent projection is an approximate solution to the KL divergence minimization problem in the original response space^[More precisely, the latent projection *replaces* the KL divergence minimization problem in the original response space by a KL divergence minimization problem in the latent space and solves the latter.], the augmented-data projection [@weber_projection_2023] gives the exact^[Here, "exact" means apart from approximations and simplifications which are also undertaken for the traditional projection.] solution for some non-ED families, namely those where the response distribution has finite support.
+While the latent projection is an approximate solution to the KL divergence minimization problem in the original response space^[More precisely, the latent projection *replaces* the KL divergence minimization problem in the original response space by a KL divergence minimization problem in the latent space and solves the latter.], the augmented-data projection [@weber_projection_2024] gives the exact^[Here, "exact" means apart from approximations and simplifications which are also undertaken for the traditional projection.] solution for some non-ED families, namely those where the response distribution has finite support.
 However, the augmented-data projection comes with a higher runtime than the latent projection.
 The families supported by **projpred**'s augmented-data projection are also listed in the main vignette (again section ["Supported types of models"](https://mc-stan.org/projpred/articles/projpred.html#modtypes)).
 
@@ -183,7 +183,7 @@ time_lat <- system.time(vs_lat <- varsel(
   ###
   nterms_max = 14,
   ### In interactive use, we recommend not to deactivate the verbose mode:
-  verbose = FALSE,
+  verbose = 0,
   ###
   ### For comparability with varsel() based on the traditional projection:
   seed = 95930
@@ -197,7 +197,7 @@ The message telling that `<refmodel>$dis` consists of only `NA`s will not concer
 
 In order to decide for a submodel size, we first inspect the `plot()` results:
 ```{r plot_vsel_lat}
-( gg_lat <- plot(vs_lat, stats = "mlpd", deltas = TRUE) )
+( gg_lat <- plot(vs_lat, stats = "mlpd", deltas = "mixed") )
 ```
 
 Although the submodels' MLPDs seem to be very close to the reference model's MLPD from a submodel size of 6 on, a zoomed plot reveals that there is still some discrepancy at sizes 6 to 11 and that size 12 would be a better choice (further down below in the `summary()` output, we will also see that on absolute scale, the discrepancy at sizes 6 to 11 is not negligible):
@@ -256,7 +256,7 @@ time_trad <- system.time(vs_trad <- varsel(
   ###
   nterms_max = 14,
   ### In interactive use, we recommend not to deactivate the verbose mode:
-  verbose = FALSE,
+  verbose = 0,
   ###
   ### For comparability with varsel() based on the latent projection:
   seed = 95930
@@ -269,7 +269,7 @@ rm(warn_instable_orig)
 ```
 ```{r post_vs_trad}
 print(time_trad)
-( gg_trad <- plot(vs_trad, stats = "mlpd", deltas = TRUE) )
+( gg_trad <- plot(vs_trad, stats = "mlpd", deltas = "mixed") )
 smmry_trad <- summary(vs_trad, stats = "mlpd",
                       type = c("mean", "lower", "upper", "diff"))
 print(smmry_trad, digits = 2)
@@ -314,11 +314,14 @@ refm_fit_nebin <- stan_glm(
 
 ### Variable selection using the latent projection
 
-To request the latent projection with `latent = TRUE`, we now need to specify more arguments (`latent_ll_oscale` and `latent_ppd_oscale`) which will be passed to `extend_family()`^[The suffix `_prec` in `refm_prec` stands for "precision" because here, we follow the Stan convention (see the Stan documentation for the `neg_binomial_2` distribution, the `brms::negbinomial()` documentation, and the [**brms**](https://paul-buerkner.github.io/brms/) vignette "Parameterization of Response Distributions in brms") and prefer the term *precision* parameter for what is denoted by $\phi$ there (confusingly, argument `size` in `?stats::NegBinomial`---which is the same as $\phi$ from the Stan notation---is called the *dispersion* parameter there, although the variance is increased by its reciprocal).]:
+To request the latent projection with `latent = TRUE`, we now need to specify more arguments (`latent_ll_oscale` and `latent_ppd_oscale`) which will be passed to `extend_family()`^[The suffix `_prec` in `refm_prec` stands for "precision" because here, we follow the Stan convention (see the Stan documentation for the `neg_binomial_2` distribution, the `brms::negbinomial()` documentation, and the [**brms**](https://paulbuerkner.com/brms/) vignette "Parameterization of Response Distributions in brms") and prefer the term *precision* parameter for what is denoted by $\phi$ there (confusingly, argument `size` in `?stats::NegBinomial`---which is the same as $\phi$ from the Stan notation---is called the *dispersion* parameter there, although the variance is increased by its reciprocal).]:
 ```{r vs_nebin}
 refm_prec <- as.matrix(refm_fit_nebin)[, "reciprocal_dispersion", drop = FALSE]
-latent_ll_oscale_nebin <- function(ilpreds, y_oscale,
-                                   wobs = rep(1, length(y_oscale)), cl_ref,
+latent_ll_oscale_nebin <- function(ilpreds,
+                                   dis = rep(NA, nrow(ilpreds)),
+                                   y_oscale,
+                                   wobs = rep(1, length(y_oscale)),
+                                   cl_ref,
                                    wdraws_ref = rep(1, length(cl_ref))) {
   y_oscale_mat <- matrix(y_oscale, nrow = nrow(ilpreds), ncol = ncol(ilpreds),
                          byrow = TRUE)
@@ -328,7 +331,10 @@ latent_ll_oscale_nebin <- function(ilpreds, y_oscale,
   ll_unw <- dnbinom(y_oscale_mat, size = refm_prec_agg, mu = ilpreds, log = TRUE)
   return(wobs_mat * ll_unw)
 }
-latent_ppd_oscale_nebin <- function(ilpreds_resamp, wobs, cl_ref,
+latent_ppd_oscale_nebin <- function(ilpreds_resamp,
+                                    dis_resamp = rep(NA, nrow(ilpreds_resamp)),
+                                    wobs,
+                                    cl_ref,
                                     wdraws_ref = rep(1, length(cl_ref)),
                                     idxs_prjdraws) {
   refm_prec_agg <- cl_agg(refm_prec, cl = cl_ref, wdraws = wdraws_ref)
@@ -350,7 +356,7 @@ vs_nebin <- varsel(
   ###
   nterms_max = 14,
   ### In interactive use, we recommend not to deactivate the verbose mode:
-  verbose = FALSE
+  verbose = 0
   ###
 )
 ```
@@ -359,7 +365,7 @@ The message concerning `latent_ilink` can be safely ignored here (the internal d
 
 Again, we first inspect the `plot()` results to decide for a submodel size:
 ```{r plot_vsel_nebin}
-( gg_nebin <- plot(vs_nebin, stats = "mlpd", deltas = TRUE) )
+( gg_nebin <- plot(vs_nebin, stats = "mlpd", deltas = "mixed") )
 ```
 
 Again, a zoomed plot is more helpful:

@@ -23,7 +23,7 @@ varsel(object, ...)
   nclusters_pred = NULL,
   refit_prj = !inherits(object, "datafit"),
   nterms_max = NULL,
-  verbose = TRUE,
+  verbose = getOption("projpred.verbose", as.integer(interactive())),
   search_control = NULL,
   lambda_min_ratio = 1e-05,
   nlambda = 150,
@@ -91,8 +91,13 @@ supplied). Note that \code{nterms_max} does not count the intercept, so use
 \code{nterms_max = 0} for the intercept-only model. (Correspondingly, \code{D} above
 does not count the intercept.)}
 
-\item{verbose}{A single logical value indicating whether to print out
-additional information during the computations.}
+\item{verbose}{A single integer value from the set \eqn{\{0, 1, 2, 3,
+  4\}}{{0, 1, 2, 3, 4}} (for \code{\link[=varsel]{varsel()}}, \eqn{3} and \eqn{4} have the same
+effect), indicating how much information (if any) to print out during the
+computations. Higher values indicate that more information should be
+printed, \code{0} deactivates the verbose mode. Internally, argument \code{verbose}
+is coerced to integer via \code{as.integer()}, so technically, a single logical
+value or a single numeric value work as well.}
 
 \item{search_control}{A \code{list} of "control" arguments (i.e., tuning
 parameters) for the search. In case of forward search, these arguments are
@@ -165,7 +170,7 @@ variable selection. The search part determines the predictor ranking (also
 known as solution path), i.e., the best submodel for each submodel size
 (number of predictor terms). The evaluation part determines the predictive
 performance of the submodels along the predictor ranking. A special method is
-\code{\link[=varsel.vsel]{varsel.vsel()}} because it re-uses the search results from an earlier
+\code{\link[=varsel.vsel]{varsel.vsel()}} which re-uses the search results from an earlier
 \code{\link[=varsel]{varsel()}} (or \code{\link[=cv_varsel]{cv_varsel()}}) run, as illustrated in the main vignette.
 }
 \details{
@@ -185,8 +190,9 @@ effect.
 
 L1 search is faster than forward search, but forward search may be more
 accurate. Furthermore, forward search may find a sparser model with
-comparable performance to that found by L1 search, but it may also start
-overfitting when more predictors are added.
+comparable performance to that found by L1 search, but it may also
+overfit when more predictors are added. This overfit can be detected
+by running search validation (see \code{\link[=cv_varsel]{cv_varsel()}}).
 
 An L1 search may select an interaction term before all involved lower-order
 interaction terms (including main-effect terms) have been selected. In
