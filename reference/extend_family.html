@@ -19,7 +19,7 @@ init_refmodel(), so you will rarely need to call it yourself."><meta property="o
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">projpred</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.8.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.9.0</span>
       </span>
     </div>
 
@@ -295,9 +295,11 @@ transformed to the original response space, with the following structure:</p><ul
 given in <code>family$cats</code>, after taking <code>latent_y_unqs</code> into account).</p></li>
 </ul><p>The function supplied to argument <code>latent_ll_oscale</code> needs to have the
 prototype</p>
-<p></p><div class="sourceCode r"><pre><code><span><span class="fu">latent_ll_oscale</span><span class="op">(</span><span class="va">ilpreds</span>, <span class="va">y_oscale</span>, wobs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y_oscale</span><span class="op">)</span><span class="op">)</span>, <span class="va">cl_ref</span>,</span>
-<span>                 wdraws_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cl_ref</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre><p></p></div>
+<p></p><div class="sourceCode r"><pre><code><span><span class="fu">latent_ll_oscale</span><span class="op">(</span><span class="va">ilpreds</span>, <span class="va">dis</span>, <span class="va">y_oscale</span>, wobs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y_oscale</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                 <span class="va">cl_ref</span>, wdraws_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cl_ref</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre><p></p></div>
 <p>where:</p><ul><li><p><code>ilpreds</code> accepts the return value from <code>latent_ilink</code>.</p></li>
+<li><p><code>dis</code> accepts a vector of length \(S\) containing dispersion parameter
+draws.</p></li>
 <li><p><code>y_oscale</code> accepts a vector of length \(N\) containing response values on
 the original response scale.</p></li>
 <li><p><code>wobs</code> accepts a numeric vector of length \(N\) containing observation
@@ -310,11 +312,14 @@ matrix containing the response-scale (not latent-scale) log-likelihood values
 for the \(N\) observations from its inputs.</p>
 <p>The function supplied to argument <code>latent_ppd_oscale</code> needs to have the
 prototype</p>
-<p></p><div class="sourceCode r"><pre><code><span><span class="fu">latent_ppd_oscale</span><span class="op">(</span><span class="va">ilpreds_resamp</span>, <span class="va">wobs</span>, <span class="va">cl_ref</span>,</span>
+<p></p><div class="sourceCode r"><pre><code><span><span class="fu">latent_ppd_oscale</span><span class="op">(</span><span class="va">ilpreds_resamp</span>, <span class="va">dis_resamp</span>, <span class="va">wobs</span>, <span class="va">cl_ref</span>,</span>
 <span>                  wdraws_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cl_ref</span><span class="op">)</span><span class="op">)</span>, <span class="va">idxs_prjdraws</span><span class="op">)</span></span></code></pre><p></p></div>
 <p>where:</p><ul><li><p><code>ilpreds_resamp</code> accepts the return value from <code>latent_ilink</code>, but possibly
 with resampled (clustered) draws (see argument <code>nresample_clusters</code> of
 <code><a href="pred-projection.html">proj_predict()</a></code>).</p></li>
+<li><p><code>dis_resamp</code> accepts a vector of length \(\texttt{dim(ilpreds)[1]}\)
+containing dispersion parameter draws, possibly resampled (in the same way as
+the draws in <code>ilpreds_resamp</code>, see also argument <code>idxs_prjdraws</code>).</p></li>
 <li><p><code>wobs</code> accepts a numeric vector of length \(N\) containing observation
 weights.</p></li>
 <li><p><code>cl_ref</code> accepts the same input as argument <code>cl_ref</code> of <code>latent_ilink</code>.</p></li>

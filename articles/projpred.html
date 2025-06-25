@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">projpred</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.8.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.9.0</span>
       </span>
     </div>
 
@@ -153,7 +153,7 @@ inference.</p>
 <p>The projection predictive variable selection is based on the ideas of
 <span class="citation">Goutis and Robert (<a href="#ref-goutis_model_1998">1998</a>)</span> and <span class="citation">Dupuis and Robert (<a href="#ref-dupuis_variable_2003">2003</a>)</span>. The methods
 implemented in <strong>projpred</strong> are described in detail in
-<span class="citation">Piironen, Paasiniemi, and Vehtari (<a href="#ref-piironen_projective_2020">2020</a>)</span>, <span class="citation">Catalina, Bürkner, and Vehtari (<a href="#ref-catalina_projection_2022">2022</a>)</span>, <span class="citation">Weber, Glass, and Vehtari (<a href="#ref-weber_projection_2023">2023</a>)</span>, and <span class="citation">Catalina, Bürkner, and Vehtari (<a href="#ref-catalina_latent_2021">2021</a>)</span>. A comparison to many
+<span class="citation">Piironen, Paasiniemi, and Vehtari (<a href="#ref-piironen_projective_2020">2020</a>)</span>, <span class="citation">Catalina, Bürkner, and Vehtari (<a href="#ref-catalina_projection_2022">2022</a>)</span>, <span class="citation">Weber, Glass, and Vehtari (<a href="#ref-weber_projection_2024">2024</a>)</span>, and <span class="citation">Catalina, Bürkner, and Vehtari (<a href="#ref-catalina_latent_2021">2021</a>)</span>. A comparison to many
 other methods may also be found in <span class="citation">Piironen and
 Vehtari (<a href="#ref-piironen_comparison_2017">2017a</a>)</span>. For
 details on how to cite <strong>projpred</strong>, see the <a href="https://CRAN.R-project.org/package=projpred/citation.html" class="external-link">projpred
@@ -181,12 +181,12 @@ predictive variable selection is to find a subset of a set of candidate
 predictors which is as small as possible but achieves a predictive
 performance as close as possible to that of the reference model.</p>
 <p>Usually (and this is also the case in this vignette), the reference
-model will be an <a href="https://mc-stan.org/rstanarm/" class="external-link"><strong>rstanarm</strong></a> or <a href="https://paul-buerkner.github.io/brms/" class="external-link"><strong>brms</strong></a>
-fit. To our knowledge, <strong>rstanarm</strong> and
-<strong>brms</strong> are currently the only packages for which a
-<code><a href="../reference/refmodel-init-get.html">get_refmodel()</a></code> method (which establishes the compatibility
-with <strong>projpred</strong>) exists. Creating a reference model
-object via one of these methods <code><a href="../reference/refmodel-init-get.html">get_refmodel.stanreg()</a></code> or
+model will be an <a href="https://mc-stan.org/rstanarm/" class="external-link"><strong>rstanarm</strong></a> or <a href="https://paulbuerkner.com/brms/" class="external-link"><strong>brms</strong></a> fit. To
+our knowledge, <strong>rstanarm</strong> and <strong>brms</strong> are
+currently the only packages for which a <code><a href="../reference/refmodel-init-get.html">get_refmodel()</a></code>
+method (which establishes the compatibility with
+<strong>projpred</strong>) exists. Creating a reference model object via
+one of these methods <code><a href="../reference/refmodel-init-get.html">get_refmodel.stanreg()</a></code> or
 <code><a href="https://paulbuerkner.com/brms/reference/get_refmodel.brmsfit.html" class="external-link">brms::get_refmodel.brmsfit()</a></code> (either implicitly by a call
 to a top-level function such as <code><a href="../reference/project.html">project()</a></code>,
 <code><a href="../reference/varsel.html">varsel()</a></code>, and <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>, as done below, or
@@ -304,13 +304,14 @@ sampling leave-one-out CV <span class="citation">(PSIS-LOO CV, see <a href="#ref
 <a href="#ref-vehtari_pareto_2022">Vehtari et al. 2022</a>)</span>. With
 <code>cv_method = "kfold"</code>, <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> runs a
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold
-CV. The extent of the CV depends on <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>’s argument
-<code>validate_search</code>: If <code>validate_search = TRUE</code>
-(the default), the search part is run with the training data of each CV
-fold separately and the evaluation part is run with the corresponding
-test data of each CV fold. If <code>validate_search = FALSE</code>, the
-search is excluded from the CV so that only a single full-data search is
-run. Because of its most thorough protection against overfitting<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>,
+CV. The extent of the CV mainly depends on <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>’s
+argument <code>validate_search</code>: If
+<code>validate_search = TRUE</code> (the default), the search part is
+run with the training data of each CV fold separately and the evaluation
+part is run with the corresponding test data of each CV fold. If
+<code>validate_search = FALSE</code>, the search is excluded from the CV
+so that only a single full-data search is run. Because of its most
+thorough protection against overfitting<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>,
 <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with <code>validate_search = TRUE</code> is
 recommended over <code><a href="../reference/varsel.html">varsel()</a></code> and <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with
 <code>validate_search = FALSE</code>. Nonetheless, a preliminary and
@@ -343,19 +344,12 @@ and set <code>refit_prj</code> to <code>FALSE</code>.</p>
 <span>  <span class="co">###</span></span>
 <span>  nterms_max <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  <span class="co">### In interactive use, we recommend not to deactivate the verbose mode:</span></span>
-<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  verbose <span class="op">=</span> <span class="fl">0</span></span>
 <span>  <span class="co">### </span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code>Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.</code></pre>
-<pre><code>Warning in warn_pareto(n07 = sum(pareto_k &gt; 0.7), n05 = sum(0.7 &gt;= pareto_k &amp; :
-In the calculation of the reference model's PSIS-LOO CV weights, 3 (out of 100)
-Pareto k-values are in the interval (0.5, 0.7]. Moment matching (see the loo
-package), mixture importance sampling (see the loo package), and `reloo`-ing
-(see the brms package) are not supported by projpred. If these techniques (run
-outside of projpred, i.e., for the reference model only; note that `reloo`-ing
-may be computationally costly) result in a markedly different reference model
-ELPD estimate than ordinary PSIS-LOO CV does, we recommend to use K-fold CV
-within projpred.</code></pre>
+<pre><code>Warning: Some (2 / 100) Pareto k's for the reference model's PSIS-LOO weights
+are &gt; 0.67.</code></pre>
 <p>In this case, we ignore the Pareto
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
 warnings due to the reduced values for <code>chains</code> and
@@ -370,9 +364,15 @@ documentation for argument <code>stats</code> of
 statistic. Since we will be using the following plot only to determine
 <code>nterms_max</code> for subsequent <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> runs, we
 can omit the predictor ranking from the plot by setting
-<code>ranking_nterms_max</code> to <code>NA</code>:</p>
+<code>ranking_nterms_max</code> to <code>NA</code> (which requires
+<code>size_position = "primary_x_bottom"</code>, which we set here via
+its global option, just like arguments <code>text_angle</code> and
+<code>show_cv_proportions</code> of <code><a href="../reference/plot.vsel.html">plot.vsel()</a></code>):</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvvs_fast</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, ranking_nterms_max <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>projpred.plot_vsel_text_angle <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>projpred.plot_vsel_show_cv_proportions <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>projpred.plot_vsel_size_position <span class="op">=</span> <span class="st">"primary_x_bottom"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvvs_fast</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, ranking_nterms_max <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></code></pre></div>
 <p><img src="projpred_files/figure-html/plot_vsel_fast-1.png" width="90%" style="display: block; margin: auto;">
 This plot suggests that the submodel MLPD levels off for the first time
 from submodel size 9 to 10 and that it increases only slightly
@@ -401,24 +401,13 @@ call (this is done by applying <code><a href="../reference/cv_varsel.html">cv_va
 <span>  nclusters_pred <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  <span class="co">###</span></span>
 <span>  <span class="co">### In interactive use, we recommend not to deactivate the verbose mode:</span></span>
-<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  verbose <span class="op">=</span> <span class="fl">0</span></span>
 <span>  <span class="co">### </span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code>Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.</code></pre>
-<pre><code>Warning in warn_pareto(n07 = sum(pareto_k &gt; 0.7), n05 = sum(0.7 &gt;= pareto_k &amp; :
-In the calculation of the reference model's PSIS-LOO CV weights, 3 (out of 100)
-Pareto k-values are in the interval (0.5, 0.7]. Moment matching (see the loo
-package), mixture importance sampling (see the loo package), and `reloo`-ing
-(see the brms package) are not supported by projpred. If these techniques (run
-outside of projpred, i.e., for the reference model only; note that `reloo`-ing
-may be computationally costly) result in a markedly different reference model
-ELPD estimate than ordinary PSIS-LOO CV does, we recommend to use K-fold CV
-within projpred.</code></pre>
-<pre><code>Warning in loo_varsel(refmodel = refmodel, method = method, nterms_max =
-nterms_max, : The projected draws used for the performance evaluation have
-different (i.e., nonconstant) weights, so using standard importance sampling
-(SIS) instead of Pareto-smoothed importance sampling (PSIS). In general, PSIS
-is recommended over SIS.</code></pre>
+<pre><code>Warning: Some (2 / 100) Pareto k's for the reference model's PSIS-LOO weights
+are &gt; 0.67.</code></pre>
+<pre><code>Using standard importance sampling (SIS) due to a small number of clusters.</code></pre>
 <p>As explained above, we ignore the Pareto
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
 warnings <!-- and also the warning that SIS is used instead of PSIS -->
@@ -448,8 +437,10 @@ and instead head over to the final <code><a href="../reference/cv_varsel.html">c
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold
 CV with a small number of folds (<code>K = 2</code>) to make this
 vignette build faster. In practice, we recommend using either the
-default of <code>cv_method = "LOO"</code> or a larger value for
-<code>K</code> if this is possible in terms of computation time.
+default of <code>cv_method = "LOO"</code> (possibly subsampled, see
+argument <code>nloo</code> of <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>) or a larger
+value for <code>K</code> if this is possible in terms of computation
+time.
 <!-- For the sake of speed, we also set `nclusters_pred` to a comparatively low value of `20`. Furthermore, we illustrate -->
 Here, we also perform the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>
@@ -496,7 +487,7 @@ https://mc-stan.org/misc/warnings.html#bulk-ess</code></pre>
 <span>  nterms_max <span class="op">=</span> <span class="fl">9</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="co">### In interactive use, we recommend not to deactivate the verbose mode:</span></span>
-<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  verbose <span class="op">=</span> <span class="fl">0</span></span>
 <span>  <span class="co">### </span></span>
 <span><span class="op">)</span></span>
 <span><span class="co"># Tear down the CV parallelization setup:</span></span>
@@ -506,16 +497,24 @@ https://mc-stan.org/misc/warnings.html#bulk-ess</code></pre>
 <p>We can now select a final submodel size by looking at a predictive
 performance plot similar to the one created for the preliminary
 <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> run above. By default, the performance
-statistics are plotted on their original scale, but with
-<code>deltas = TRUE</code>, they are plotted as differences<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a> from a
-baseline model (which is the reference model by default, at least in the
-most common cases). Since the differences<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a> and the (frequentist)
-uncertainty in their estimation are usually of more interest than the
-original-scale performance statistics (at least with regard to the
-decision for a final submodel size), we directly plot with
-<code>deltas = TRUE</code> here:</p>
+statistics are plotted on their actual scale and the uncertainty bars
+match this scale, but argument <code>deltas</code> offers two more
+options:</p>
+<ul>
+<li>With <code>deltas = TRUE</code>, the performance statistics are
+plotted as differences<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a> from the baseline model<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a> and the uncertainty
+bars match this scale,</li>
+<li>With <code>deltas = "mixed"</code>, the performance statistics
+(i.e., their point estimates) are plotted on the actual scale, but the
+uncertainty bars visualize the difference-scale uncertainty.</li>
+</ul>
+<p>Since the difference-scale uncertainty is usually of more interest
+than the actual-scale uncertainty (at least with regard to the decision
+for a final submodel size) and the actual-scale point estimates are
+often of more interest than the difference-scale point estimates, we
+plot with <code>deltas = "mixed"</code> here:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvvs</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, deltas <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvvs</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, deltas <span class="op">=</span> <span class="st">"mixed"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="projpred_files/figure-html/plot_vsel-1.png" width="90%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -570,8 +569,10 @@ minimum number of printed significant digits), we may call
 <code><a href="../reference/summary.vsel.html">summary.vsel()</a></code> and <code><a href="../reference/print.vselsummary.html">print.vselsummary()</a></code> as
 follows:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">smmry</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cvvs</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"lower"</span>, <span class="st">"upper"</span><span class="op">)</span>,</span>
-<span>                 deltas <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">smmry</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cvvs</span>,</span>
+<span>                 stats <span class="op">=</span> <span class="st">"mlpd"</span>,</span>
+<span>                 type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"diff.lower"</span>, <span class="st">"diff.upper"</span><span class="op">)</span>,</span>
+<span>                 deltas <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">smmry</span>, digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
 Family: gaussian 
@@ -588,22 +589,22 @@ Number of projected draws in the search: 1 (from clustered projection)
 Number of projected draws in the performance evaluation: 20 (from clustered projection)
 Argument `refit_prj`: TRUE
 
-Submodel performance evaluation summary with `deltas = TRUE` and `cumulate = FALSE`:
- size ranking_fulldata cv_proportions_diag   mlpd mlpd.lower mlpd.upper
-    0      (Intercept)                  NA -1e+00     -1.066     -0.909
-    1               X1                 1.0 -8e-01     -0.874     -0.709
-    2              X14                 1.0 -6e-01     -0.667     -0.503
-    3              X20                 0.5 -5e-01     -0.540     -0.393
-    4               X5                 0.0 -4e-01     -0.523     -0.375
-    5               X6                 0.0 -2e-01     -0.267     -0.155
-    6               X3                 0.5 -4e-02     -0.072     -0.004
-    7               X8                 0.5 -2e-04     -0.033      0.032
-    8              X11                 0.5  5e-02      0.032      0.068
-    9               X7                 0.0  1e-02     -0.003      0.027
+Submodel performance evaluation summary with `deltas = FALSE` and `cumulate = FALSE`:
+ size ranking_fulldata cv_proportions_diag mlpd mlpd.diff.lower mlpd.diff.upper
+    0      (Intercept)                  NA   -3          -1.066          -0.909
+    1               X1                 1.0   -2          -0.874          -0.709
+    2              X14                 1.0   -2          -0.667          -0.503
+    3              X20                 0.5   -2          -0.540          -0.393
+    4               X5                 0.0   -2          -0.523          -0.375
+    5               X6                 0.0   -2          -0.267          -0.155
+    6               X3                 0.5   -2          -0.072          -0.004
+    7               X8                 0.5   -2          -0.033           0.032
+    8              X11                 0.5   -1           0.032           0.068
+    9               X7                 0.0   -2          -0.003           0.027
 
-Reference model performance evaluation summary with `deltas = TRUE`:
-      mlpd mlpd.lower mlpd.upper 
-         0          0          0 </code></pre>
+Reference model performance evaluation summary with `deltas = FALSE`:
+mlpd 
+  -2 </code></pre>
 </div>
 <div class="section level3">
 <h3 id="predictor-rankings-and-identification-of-the-selected-submodel">Predictor ranking(s) and identification of the selected
@@ -738,14 +739,14 @@ we project the reference model onto the final submodel once again<a href="#fn11"
 <!-- ```{r prll_prj_prep} -->
 <!-- if (!identical(.Platform$OS.type, "windows")) { -->
 <!--   doParallel::registerDoParallel(ncores) -->
-<!--   trigger_default <- options(projpred.prll_prj_trigger = 200) -->
+<!--   trigger_default <- options(projpred.parallel_proj_trigger = 200) -->
 <!-- } --> <!-- ``` --></p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/project.html">project</a></span><span class="op">(</span></span>
 <span>  <span class="va">refm_obj</span>,</span>
 <span>  predictor_terms <span class="op">=</span> <span class="va">predictors_final</span>,</span>
 <span>  <span class="co">### In interactive use, we recommend not to deactivate the verbose mode:</span></span>
-<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  verbose <span class="op">=</span> <span class="fl">0</span></span>
 <span>  <span class="co">###</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <!-- ```{r prll_prj_tear} -->
@@ -908,8 +909,8 @@ vignette, <strong>projpred</strong>’s traditional projection also
 supports the <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial()</a></code><a href="#fn16" class="footnote-ref" id="fnref16"><sup>16</sup></a> and the <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson()</a></code>
 family.</p>
 <p>The families supported by <strong>projpred</strong>’s augmented-data
-projection <span class="citation">(<a href="#ref-weber_projection_2023">Weber, Glass, and Vehtari
-2023</a>)</span> are <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial()</a></code><a href="#fn17" class="footnote-ref" id="fnref17"><sup>17</sup></a> <a href="#fn18" class="footnote-ref" id="fnref18"><sup>18</sup></a>,
+projection <span class="citation">(<a href="#ref-weber_projection_2024">Weber, Glass, and Vehtari
+2024</a>)</span> are <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial()</a></code><a href="#fn17" class="footnote-ref" id="fnref17"><sup>17</sup></a> <a href="#fn18" class="footnote-ref" id="fnref18"><sup>18</sup></a>,
 <code><a href="https://paulbuerkner.com/brms/reference/brmsfamily.html" class="external-link">brms::cumulative()</a></code>, <code><a href="https://mc-stan.org/rstanarm/reference/stan_polr.html" class="external-link">rstanarm::stan_polr()</a></code>
 fits, and <code><a href="https://paulbuerkner.com/brms/reference/brmsfamily.html" class="external-link">brms::categorical()</a></code><a href="#fn19" class="footnote-ref" id="fnref19"><sup>19</sup></a> <a href="#fn20" class="footnote-ref" id="fnref20"><sup>20</sup></a>. See
 <code><a href="../reference/extend_family.html">?extend_family</a></code> (which is called by
@@ -1107,14 +1108,17 @@ predictive performance evaluation. However, as explained in section <a href="#va
 <code>validate_search = FALSE</code> is more prone to overfitting than
 <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with
 <code>validate_search = TRUE</code>.</p></li>
+<li><p>Using <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with subsampled PSIS-LOO CV, see
+argument <code>nloo</code> of <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>.</p></li>
 <li><p>Using <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold
 CV instead of PSIS-LOO CV. Whether this provides a speed improvement
-mainly depends on the number of observations and the complexity of the
-reference model. Note that PSIS-LOO CV is often more accurate than
+mainly depends on the number of observations, argument <code>nloo</code>
+of <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>, and the complexity of the reference model.
+Note that PSIS-LOO CV is often more accurate than
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold
-CV if argument <code>K</code> is (much) smaller than the number of
-observations.</p></li>
+CV if argument <code>K</code> is (much) smaller than argument
+<code>nloo</code> of <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>.</p></li>
 <li><p>Using a “custom” reference model object with a dimension
 reduction technique for the predictor data (e.g., by computing principal
 components from the original predictors, using these principal
@@ -1272,10 +1276,10 @@ Vehtari, Aki, Daniel Simpson, Andrew Gelman, Yuling Yao, and Jonah
 Gabry. 2022. <span>“Pareto Smoothed Importance Sampling.”</span>
 <span>arXiv</span>. <a href="https://doi.org/10.48550/arXiv.1507.02646" class="external-link">https://doi.org/10.48550/arXiv.1507.02646</a>.
 </div>
-<div id="ref-weber_projection_2023" class="csl-entry">
-Weber, Frank, Änne Glass, and Aki Vehtari. 2023. <span>“Projection
+<div id="ref-weber_projection_2024" class="csl-entry">
+Weber, Frank, Änne Glass, and Aki Vehtari. 2024. <span>“Projection
 Predictive Variable Selection for Discrete Response Families with Finite
-Support.”</span> <span>arXiv</span>. <a href="https://doi.org/10.48550/arXiv.2301.01660" class="external-link">https://doi.org/10.48550/arXiv.2301.01660</a>.
+Support.”</span> <em>Computational Statistics</em>. <a href="https://doi.org/10.1007/s00180-024-01506-0" class="external-link">https://doi.org/10.1007/s00180-024-01506-0</a>.
 </div>
 </div>
 </div>
@@ -1303,10 +1307,15 @@ Vehtari 2017a</a>)</span>.<a href="#fnref5" class="footnote-back">↩︎</a></p>
 <li id="fn6"><p>Analogous functionality has been implemented for
 <code><a href="../reference/varsel.html">varsel()</a></code>, namely in <code><a href="../reference/varsel.html">varsel.vsel()</a></code>.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
 <li id="fn7"><p>For the geometric mean predictive density (GMPD, see
-argument <code>stats</code> of <code><a href="../reference/summary.vsel.html">summary.vsel()</a></code>),
-<code>deltas = TRUE</code> means to calculate the GMPD <em>ratio</em>
-(not difference) vs. the baseline model.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
-<li id="fn8"><p>For the GMPD, this is again a ratio.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
+argument <code>stats</code> of <code><a href="../reference/summary.vsel.html">summary.vsel()</a></code> and
+<code><a href="../reference/plot.vsel.html">plot.vsel()</a></code>), <code>deltas = TRUE</code> plots the GMPD
+<em>ratio</em> (not difference) vs. the baseline model. Despite this
+special case, we will call <code>deltas = TRUE</code> the “difference
+scale” for simplicity.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn8"><p>For the definition of the baseline model, see argument
+<code>baseline</code> of <code><a href="../reference/summary.vsel.html">summary.vsel()</a></code> and
+<code><a href="../reference/plot.vsel.html">plot.vsel()</a></code>; in the most common cases, the default baseline
+model is the reference model.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
 <li id="fn9"><p>In general, only <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with
 <code>validate_search = TRUE</code> (which we have here) allows to judge
 whether the submodels perform better than the reference model or not.
@@ -1393,10 +1402,8 @@ version 2.19.0 or later is needed.<a href="#fnref23" class="footnote-back">↩�
 terms.<a href="#fnref25" class="footnote-back">↩︎</a></p></li>
 <li id="fn26"><p>In case of <code>cv_method = "kfold"</code>, the
 runtime advantage of <code>validate_search = FALSE</code> compared to
-<code>validate_search = TRUE</code> is not as large as in case of
-<code>cv_method = "LOO"</code>, but even for
-<code>cv_method = "kfold"</code>, such a runtime advantage still
-exists.<a href="#fnref26" class="footnote-back">↩︎</a></p></li>
+<code>validate_search = TRUE</code> is by far not as large as in case of
+<code>cv_method = "LOO"</code>.<a href="#fnref26" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
   </div>

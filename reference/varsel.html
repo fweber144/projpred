@@ -4,7 +4,7 @@ variable selection. The search part determines the predictor ranking (also
 known as solution path), i.e., the best submodel for each submodel size
 (number of predictor terms). The evaluation part determines the predictive
 performance of the submodels along the predictor ranking. A special method is
-varsel.vsel() because it re-uses the search results from an earlier
+varsel.vsel() which re-uses the search results from an earlier
 varsel() (or cv_varsel()) run, as illustrated in the main vignette."><meta property="og:image" content="https://mc-stan.org/projpred/logo.svg"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -23,7 +23,7 @@ varsel() (or cv_varsel()) run, as illustrated in the main vignette."><meta prope
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">projpred</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.8.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.9.0</span>
       </span>
     </div>
 
@@ -115,7 +115,7 @@ variable selection. The search part determines the predictor ranking (also
 known as solution path), i.e., the best submodel for each submodel size
 (number of predictor terms). The evaluation part determines the predictive
 performance of the submodels along the predictor ranking. A special method is
-<code>varsel.vsel()</code> because it re-uses the search results from an earlier
+<code>varsel.vsel()</code> which re-uses the search results from an earlier
 <code>varsel()</code> (or <code><a href="cv_varsel.html">cv_varsel()</a></code>) run, as illustrated in the main vignette.</p>
     </div>
 
@@ -139,7 +139,7 @@ performance of the submodels along the predictor ranking. A special method is
 <span>  nclusters_pred <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  refit_prj <span class="op">=</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">object</span>, <span class="st">"datafit"</span><span class="op">)</span>,</span>
 <span>  nterms_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"projpred.verbose"</span>, <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  search_control <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lambda_min_ratio <span class="op">=</span> <span class="fl">1e-05</span>,</span>
 <span>  nlambda <span class="op">=</span> <span class="fl">150</span>,</span>
@@ -232,8 +232,13 @@ does not count the intercept.)</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
-<dd><p>A single logical value indicating whether to print out
-additional information during the computations.</p></dd>
+<dd><p>A single integer value from the set \(\{0, 1, 2, 3,
+  4\}\) (for <code>varsel()</code>, \(3\) and \(4\) have the same
+effect), indicating how much information (if any) to print out during the
+computations. Higher values indicate that more information should be
+printed, <code>0</code> deactivates the verbose mode. Internally, argument <code>verbose</code>
+is coerced to integer via <code><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer()</a></code>, so technically, a single logical
+value or a single numeric value work as well.</p></dd>
 
 
 <dt id="arg-search-control">search_control<a class="anchor" aria-label="anchor" href="#arg-search-control"></a></dt>
@@ -332,8 +337,9 @@ Furthermore, argument <code>search_terms</code> requires a forward search to tak
 effect.</p>
 <p>L1 search is faster than forward search, but forward search may be more
 accurate. Furthermore, forward search may find a sparser model with
-comparable performance to that found by L1 search, but it may also start
-overfitting when more predictors are added.</p>
+comparable performance to that found by L1 search, but it may also
+overfit when more predictors are added. This overfit can be detected
+by running search validation (see <code><a href="cv_varsel.html">cv_varsel()</a></code>).</p>
 <p>An L1 search may select an interaction term before all involved lower-order
 interaction terms (including main-effect terms) have been selected. In
 <span class="pkg">projpred</span> versions &gt; 2.6.0, the resulting predictor ranking is

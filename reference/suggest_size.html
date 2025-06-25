@@ -22,7 +22,7 @@ decision based on what is most appropriate for the problem at hand.'><meta prope
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">projpred</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.8.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.9.0</span>
       </span>
     </div>
 
@@ -150,7 +150,8 @@ passed here.</p></dd>
 
 <dt id="arg-stat">stat<a class="anchor" aria-label="anchor" href="#arg-stat"></a></dt>
 <dd><p>Performance statistic (i.e., utility or loss) used for the
-decision. See argument <code>stats</code> of <code><a href="summary.vsel.html">summary.vsel()</a></code> for possible choices.</p></dd>
+decision. See argument <code>stats</code> of <code><a href="summary.vsel.html">summary.vsel()</a></code> and <code><a href="plot.vsel.html">plot.vsel()</a></code> for
+possible choices.</p></dd>
 
 
 <dt id="arg-pct">pct<a class="anchor" aria-label="anchor" href="#arg-pct"></a></dt>
@@ -161,7 +162,7 @@ for more information.</p></dd>
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
 <dd><p>Either <code>"upper"</code> or <code>"lower"</code> determining whether the decision is
-based on the upper or lower confidence interval bound, respectively. See
+based on the upper or lower uncertainty interval bound, respectively. See
 section "Details" below for more information.</p></dd>
 
 
@@ -192,12 +193,11 @@ zero stands for the intercept-only model.</p>
     <p>In general (beware of special cases below), the suggested model
 size is the smallest model size \(j \in \{0, 1, ...,
   \texttt{nterms\_max}\}\) for which either the
-lower or upper bound (depending on argument <code>type</code>) of the
-normal-approximation (or bootstrap or exponentiated normal-approximation;
-see argument <code>stat</code>) confidence interval (with nominal coverage <code>1 - alpha</code>; see argument <code>alpha</code> of <code><a href="summary.vsel.html">summary.vsel()</a></code>) for \(U_j -
-  U_{\mathrm{base}}\) (with \(U_j\) denoting the \(j\)-th
-submodel's true utility and \(U_{\mathrm{base}}\) denoting the
-baseline model's true utility)
+lower or upper bound (depending on argument <code>type</code>) of the uncertainty
+interval (with nominal coverage <code>1 - alpha</code>; see argument <code>alpha</code> of
+<code><a href="summary.vsel.html">summary.vsel()</a></code>) for \(U_j - U_{\mathrm{base}}\) (with
+\(U_j\) denoting the \(j\)-th submodel's true utility and
+\(U_{\mathrm{base}}\) denoting the baseline model's true utility)
 falls above (or is equal to) $$\texttt{pct} \cdot (u_0 -
   u_{\mathrm{base}})$$ where \(u_0\) denotes the null
 model's estimated utility and \(u_{\mathrm{base}}\) the baseline
@@ -205,9 +205,9 @@ model's estimated utility. The baseline model is either the reference model
 or the best submodel found (see argument <code>baseline</code> of <code><a href="summary.vsel.html">summary.vsel()</a></code>).</p>
 <p>In doing so, loss statistics like the root mean squared error (RMSE) and
 the mean squared error (MSE) are converted to utilities by multiplying them
-by <code>-1</code>, so a call such as <code>suggest_size(object, stat = "rmse", type = "upper")</code> finds the smallest model size whose upper confidence interval
+by <code>-1</code>, so a call such as <code>suggest_size(object, stat = "rmse", type = "upper")</code> finds the smallest model size whose upper uncertainty interval
 bound for the <em>negative</em> RMSE or MSE exceeds (or is equal to) the cutoff
-(or, equivalently, has the lower confidence interval bound for the RMSE or
+(or, equivalently, has the lower uncertainty interval bound for the RMSE or
 MSE below—or equal to—the cutoff). This is done to make the
 interpretation of argument <code>type</code> the same regardless of argument <code>stat</code>.</p>
 <p>For the geometric mean predictive density (GMPD), the decision rule above
@@ -217,9 +217,9 @@ is applied on <code><a href="https://rdrr.io/r/base/Log.html" class="external-li
 \(U_j\) and \(U_{\mathrm{base}}\) from above are given by
 \(U_j = \log(U^\ast_j)\) and
 \(U_{\mathrm{base}} = \log(U^\ast_{\mathrm{base}})\)), then <code>suggest_size()</code> yields the smallest model size whose
-lower or upper (depending on argument <code>type</code>) confidence interval bound for
-\(\frac{U^\ast_j}{U^\ast_{\mathrm{base}}}\) exceeds (or
-is equal to)
+lower or upper (depending on argument <code>type</code>) uncertainty interval bound
+for \(\frac{U^\ast_j}{U^\ast_{\mathrm{base}}}\) exceeds
+(or is equal to)
 $$(\frac{u^\ast_0}{u^\ast_{\mathrm{base}}})^{\texttt{pct}}$$ where \(u^\ast_0\) denotes the null
 model's estimated GMPD and \(u^\ast_{\mathrm{base}}\) the
 baseline model's estimated GMPD.</p>
@@ -237,15 +237,15 @@ above <em>or</em> \(\frac{u^\ast_j}{u^\ast_{\mathrm{base}}} &gt;
 <p>For example (disregarding the special extensions in case of
 <code>!is.na(thres_elpd)</code> with <code>stat %in% c("elpd", "mlpd", "gmpd")</code>), <code>alpha = 2 * pnorm(-1)</code>, <code>pct = 0</code>, and <code>type = "upper"</code> means that we select the
 smallest model size for which the upper bound of the <code>1 - 2 * pnorm(-1)</code>
-(approximately 68.3%) confidence interval for \(U_j -
+(approximately 68.3 %) uncertainty interval for \(U_j -
   U_{\mathrm{base}}\)
 (\(\frac{U^\ast_j}{U^\ast_{\mathrm{base}}}\) in case of
 the GMPD) exceeds (or is equal to) zero (one in case of the GMPD), that is
-(if <code>stat</code> is a performance statistic for which the normal approximation is
-used, not the bootstrap and not the exponentiated normal approximation),
-for which the submodel's utility estimate is at most one standard error
-smaller than the baseline model's utility estimate (with that standard
-error referring to the utility <em>difference</em>).</p>
+(if <code>stat</code> is a performance statistic for which a normal-approximation
+uncertainty interval is used, see argument <code>stats</code> of <code><a href="summary.vsel.html">summary.vsel()</a></code> and
+<code><a href="plot.vsel.html">plot.vsel()</a></code>), for which the submodel's utility estimate is at most one
+standard error smaller than the baseline model's utility estimate (with
+that standard error referring to the utility <em>difference</em>).</p>
 <p>Apart from the two <code><a href="summary.vsel.html">summary.vsel()</a></code> arguments mentioned above (<code>alpha</code> and
 <code>baseline</code>), <code>resp_oscale</code> is another important <code><a href="summary.vsel.html">summary.vsel()</a></code> argument
 that may be passed via <code>...</code>.</p>

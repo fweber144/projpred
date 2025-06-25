@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">projpred</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.8.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.9.0</span>
       </span>
     </div>
 
@@ -237,8 +237,8 @@ documentation).</p>
 documentation.</p>
 <p>While the latent projection is an approximate solution to the KL
 divergence minimization problem in the original response space<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>, the
-augmented-data projection <span class="citation">(<a href="#ref-weber_projection_2023">Weber, Glass, and Vehtari
-2023</a>)</span> gives the exact<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> solution for some non-ED families, namely
+augmented-data projection <span class="citation">(<a href="#ref-weber_projection_2024">Weber, Glass, and Vehtari
+2024</a>)</span> gives the exact<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> solution for some non-ED families, namely
 those where the response distribution has finite support. However, the
 augmented-data projection comes with a higher runtime than the latent
 projection. The families supported by <strong>projpred</strong>’s
@@ -392,7 +392,7 @@ projection’s later:</p>
 <span>  <span class="co">###</span></span>
 <span>  nterms_max <span class="op">=</span> <span class="fl">14</span>,</span>
 <span>  <span class="co">### In interactive use, we recommend not to deactivate the verbose mode:</span></span>
-<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  <span class="co">###</span></span>
 <span>  <span class="co">### For comparability with varsel() based on the traditional projection:</span></span>
 <span>  seed <span class="op">=</span> <span class="fl">95930</span></span>
@@ -401,14 +401,14 @@ projection’s later:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">time_lat</span><span class="op">)</span></span></code></pre></div>
 <pre><code>   user  system elapsed 
-  1.988   0.000   1.988 </code></pre>
+  0.932   0.062   0.995 </code></pre>
 <p>The message telling that <code>&lt;refmodel&gt;$dis</code> consists
 of only <code>NA</code>s will not concern us here because we will only
 be focusing on response-scale post-processing.</p>
 <p>In order to decide for a submodel size, we first inspect the
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> results:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">(</span> <span class="va">gg_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vs_lat</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, deltas <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">(</span> <span class="va">gg_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vs_lat</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, deltas <span class="op">=</span> <span class="st">"mixed"</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
 <p><img src="latent_files/figure-html/plot_vsel_lat-1.png" width="90%" style="display: block; margin: auto;"></p>
 <p>Although the submodels’ MLPDs seem to be very close to the reference
 model’s MLPD from a submodel size of 6 on, a zoomed plot reveals that
@@ -545,7 +545,7 @@ projection would have given:</p>
 <span>  <span class="co">###</span></span>
 <span>  nterms_max <span class="op">=</span> <span class="fl">14</span>,</span>
 <span>  <span class="co">### In interactive use, we recommend not to deactivate the verbose mode:</span></span>
-<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  <span class="co">###</span></span>
 <span>  <span class="co">### For comparability with varsel() based on the latent projection:</span></span>
 <span>  seed <span class="op">=</span> <span class="fl">95930</span></span>
@@ -554,9 +554,9 @@ projection would have given:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">time_trad</span><span class="op">)</span></span></code></pre></div>
 <pre><code>   user  system elapsed 
-  2.860   0.000   2.862 </code></pre>
+  1.427   0.000   1.428 </code></pre>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">(</span> <span class="va">gg_trad</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vs_trad</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, deltas <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">(</span> <span class="va">gg_trad</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vs_trad</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, deltas <span class="op">=</span> <span class="st">"mixed"</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
 <p><img src="latent_files/figure-html/post_vs_trad-1.png" width="90%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">smmry_trad</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">vs_trad</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>,</span>
@@ -690,8 +690,11 @@ now need to specify more arguments (<code>latent_ll_oscale</code> and
 <code><a href="../reference/extend_family.html">extend_family()</a></code><a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">refm_prec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">refm_fit_nebin</span><span class="op">)</span><span class="op">[</span>, <span class="st">"reciprocal_dispersion"</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span></span>
-<span><span class="va">latent_ll_oscale_nebin</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ilpreds</span>, <span class="va">y_oscale</span>,</span>
-<span>                                   <span class="va">wobs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y_oscale</span><span class="op">)</span><span class="op">)</span>, <span class="va">cl_ref</span>,</span>
+<span><span class="va">latent_ll_oscale_nebin</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ilpreds</span>,</span>
+<span>                                   <span class="va">dis</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">ilpreds</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                                   <span class="va">y_oscale</span>,</span>
+<span>                                   <span class="va">wobs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y_oscale</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                                   <span class="va">cl_ref</span>,</span>
 <span>                                   <span class="va">wdraws_ref</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cl_ref</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">y_oscale_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">y_oscale</span>, nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">ilpreds</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">ilpreds</span><span class="op">)</span>,</span>
 <span>                         byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -701,7 +704,10 @@ now need to specify more arguments (<code>latent_ll_oscale</code> and
 <span>  <span class="va">ll_unw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/NegBinomial.html" class="external-link">dnbinom</a></span><span class="op">(</span><span class="va">y_oscale_mat</span>, size <span class="op">=</span> <span class="va">refm_prec_agg</span>, mu <span class="op">=</span> <span class="va">ilpreds</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">wobs_mat</span> <span class="op">*</span> <span class="va">ll_unw</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="va">latent_ppd_oscale_nebin</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ilpreds_resamp</span>, <span class="va">wobs</span>, <span class="va">cl_ref</span>,</span>
+<span><span class="va">latent_ppd_oscale_nebin</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ilpreds_resamp</span>,</span>
+<span>                                    <span class="va">dis_resamp</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">ilpreds_resamp</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                                    <span class="va">wobs</span>,</span>
+<span>                                    <span class="va">cl_ref</span>,</span>
 <span>                                    <span class="va">wdraws_ref</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cl_ref</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                                    <span class="va">idxs_prjdraws</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">refm_prec_agg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cl_agg.html">cl_agg</a></span><span class="op">(</span><span class="va">refm_prec</span>, cl <span class="op">=</span> <span class="va">cl_ref</span>, wdraws <span class="op">=</span> <span class="va">wdraws_ref</span><span class="op">)</span></span>
@@ -726,7 +732,7 @@ now need to specify more arguments (<code>latent_ll_oscale</code> and
 <span>  <span class="co">###</span></span>
 <span>  nterms_max <span class="op">=</span> <span class="fl">14</span>,</span>
 <span>  <span class="co">### In interactive use, we recommend not to deactivate the verbose mode:</span></span>
-<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  verbose <span class="op">=</span> <span class="fl">0</span></span>
 <span>  <span class="co">###</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Again, the message telling that <code>&lt;refmodel&gt;$dis</code>
@@ -738,7 +744,7 @@ this case).</p>
 <p>Again, we first inspect the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> results to decide for
 a submodel size:</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">(</span> <span class="va">gg_nebin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vs_nebin</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, deltas <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">(</span> <span class="va">gg_nebin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vs_nebin</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, deltas <span class="op">=</span> <span class="st">"mixed"</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
 <p><img src="latent_files/figure-html/plot_vsel_nebin-1.png" width="90%" style="display: block; margin: auto;"></p>
 <p>Again, a zoomed plot is more helpful:</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
@@ -890,10 +896,10 @@ Piironen, Juho, and Aki Vehtari. 2017. <span>“Sparsity Information and
 Regularization in the Horseshoe and Other Shrinkage Priors.”</span>
 <em>Electronic Journal of Statistics</em> 11 (2): 5018–51. <a href="https://doi.org/10.1214/17-EJS1337SI" class="external-link">https://doi.org/10.1214/17-EJS1337SI</a>.
 </div>
-<div id="ref-weber_projection_2023" class="csl-entry">
-Weber, Frank, Änne Glass, and Aki Vehtari. 2023. <span>“Projection
+<div id="ref-weber_projection_2024" class="csl-entry">
+Weber, Frank, Änne Glass, and Aki Vehtari. 2024. <span>“Projection
 Predictive Variable Selection for Discrete Response Families with Finite
-Support.”</span> <span>arXiv</span>. <a href="https://doi.org/10.48550/arXiv.2301.01660" class="external-link">https://doi.org/10.48550/arXiv.2301.01660</a>.
+Support.”</span> <em>Computational Statistics</em>. <a href="https://doi.org/10.1007/s00180-024-01506-0" class="external-link">https://doi.org/10.1007/s00180-024-01506-0</a>.
 </div>
 </div>
 </div>
@@ -943,9 +949,9 @@ not implemented in <strong>projpred</strong>.<a href="#fnref7" class="footnote-b
 <li id="fn8"><p>The suffix <code>_prec</code> in <code>refm_prec</code>
 stands for “precision” because here, we follow the Stan convention (see
 the Stan documentation for the <code>neg_binomial_2</code> distribution,
-the <code><a href="https://paulbuerkner.com/brms/reference/brmsfamily.html" class="external-link">brms::negbinomial()</a></code> documentation, and the <a href="https://paul-buerkner.github.io/brms/" class="external-link"><strong>brms</strong></a>
-vignette “Parameterization of Response Distributions in brms”) and
-prefer the term <em>precision</em> parameter for what is denoted by
+the <code><a href="https://paulbuerkner.com/brms/reference/brmsfamily.html" class="external-link">brms::negbinomial()</a></code> documentation, and the <a href="https://paulbuerkner.com/brms/" class="external-link"><strong>brms</strong></a> vignette
+“Parameterization of Response Distributions in brms”) and prefer the
+term <em>precision</em> parameter for what is denoted by
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϕ</mi><annotation encoding="application/x-tex">\phi</annotation></semantics></math>
 there (confusingly, argument <code>size</code> in
 <code><a href="https://rdrr.io/r/stats/NegBinomial.html" class="external-link">?stats::NegBinomial</a></code>—which is the same as
