@@ -195,9 +195,9 @@ is <code>TRUE</code>).</p></dd>
 
 <dt id="arg-cv-method">cv_method<a class="anchor" aria-label="anchor" href="#arg-cv-method"></a></dt>
 <dd><p>The CV method, either <code>"LOO"</code> or <code>"kfold"</code>. In the <code>"LOO"</code>
-case, a Pareto-smoothed importance sampling leave-one-out CV (PSIS-LOO-CV)
+case, a Pareto-smoothed importance sampling leave-one-out CV (PSIS-LOO CV)
 is performed, which avoids refitting the reference model <code>nloo</code> times (in
-contrast to a standard LOO-CV). In the <code>"kfold"</code> case, a \(K\)-fold-CV is
+contrast to a standard LOO-CV). In the <code>"kfold"</code> case, a \(K\)-fold CV is
 performed. See also section "Note" below.</p></dd>
 
 
@@ -220,7 +220,7 @@ option <code>"best"</code> for argument <code>baseline</code> of <code><a href="
 <dd><p>Only relevant if <code>cv_method = "kfold"</code> and if <code>cvfits</code> is <code>NULL</code>
 (which is the case for reference model objects created by
 <code><a href="refmodel-init-get.html">get_refmodel.stanreg()</a></code> or <code><a href="https://paulbuerkner.com/brms/reference/get_refmodel.brmsfit.html" class="external-link">brms::get_refmodel.brmsfit()</a></code>). Number of
-folds in \(K\)-fold-CV.</p></dd>
+folds in \(K\)-fold CV.</p></dd>
 
 
 <dt id="arg-cvfits">cvfits<a class="anchor" aria-label="anchor" href="#arg-cvfits"></a></dt>
@@ -232,10 +232,10 @@ folds in \(K\)-fold-CV.</p></dd>
 <dt id="arg-validate-search">validate_search<a class="anchor" aria-label="anchor" href="#arg-validate-search"></a></dt>
 <dd><p>A single logical value indicating whether to
 cross-validate also the search part, i.e., whether to run the search
-separately for each CV-fold (<code>TRUE</code>) or not (<code>FALSE</code>). With <code>FALSE</code>
+separately for each CV fold (<code>TRUE</code>) or not (<code>FALSE</code>). With <code>FALSE</code>,
 the computation is faster, but the predictive performance estimates
 of the selected submodels are optimistically biased. However, these fast
-biased estimated can be useful to obtain initial information on the
+biased estimates can be useful to obtain initial information on the
 usefulness of projection predictive variable selection.</p></dd>
 
 
@@ -357,9 +357,9 @@ results can be obtained again if needed. Passed to argument <code>seed</code> of
 <code>NA</code>, then the PRNG state is reset (to the state before calling
 <code>cv_varsel()</code>) upon exiting <code>cv_varsel()</code>. Here, <code>seed</code> is used for
 clustering the reference model's posterior draws (if <code>!is.null(nclusters)</code>
-or <code>!is.null(nclusters_pred)</code>), for subsampling PSIS-LOO-CV folds (if
+or <code>!is.null(nclusters_pred)</code>), for subsampling PSIS-LOO CV folds (if
 <code>nloo</code> is smaller than the number of observations), for sampling the folds
-in \(K\)-fold-CV, and for drawing new group-level effects when predicting
+in \(K\)-fold CV, and for drawing new group-level effects when predicting
 from a multilevel submodel (however, not yet in case of a GAMM).</p></dd>
 
 
@@ -444,30 +444,30 @@ that leads to the same results, <code>search_terms = c("x2", "x3")</code>).</p>
     <h2>Note</h2>
     <p>If <code>validate_search</code> is <code>FALSE</code>, the search is not included in the CV
 so that only a single full-data search is run. If the number of
-observations is big, the fast PSIS-LOO-CV along the full-data search path
+observations is large, the fast PSIS-LOO CV along the full-data search path
 is likely to be accurate. If the number of observations is small or
-moderate, the fast PSIS-LOO-CV along the full-data search path is likely to
+moderate, the fast PSIS-LOO CV along the full-data search path is likely to
 have optimistic bias in the middle of the search path. This result can be
 used to guide further actions and the optimistic bias can be greatly
 reduced by using <code>validate_search = TRUE</code>.</p>
-<p>PSIS uses Pareto-\(\hat{k}\) diagnostic to assess the reliability of
-PSIS-LOO-CV. Global option <code>projpred.warn_psis</code> (default <code>TRUE</code>) controls
+<p>PSIS uses the Pareto-\(\hat{k}\) diagnostic to assess the reliability of
+PSIS-LOO CV. Global option <code>projpred.warn_psis</code> (default <code>TRUE</code>) controls
 whether the Pareto-\(\hat{k}\) diagnostics may result in warnings. See
 <a href="https://mc-stan.org/loo/reference/loo-glossary.html" class="external-link">loo::loo-glossary</a> for how to interpret the Pareto-\(\hat{k}\) values
 and the warning thresholds. <span class="pkg">projpred</span> does not support the usually
 recommended moment-matching (see <code><a href="https://mc-stan.org/loo/reference/loo_moment_match.html" class="external-link">loo::loo_moment_match()</a></code> and
 <code><a href="https://paulbuerkner.com/brms/reference/loo_moment_match.brmsfit.html" class="external-link">brms::loo_moment_match()</a></code>), mixture importance sampling
 (<code><a href="https://mc-stan.org/loo/articles/loo2-mixis.html" class="external-link">vignette("loo2-mixis", package="loo")</a></code>), or <code>reloo</code>-ing
-(<code><a href="https://paulbuerkner.com/brms/reference/reloo.brmsfit.html" class="external-link">brms::reloo()</a></code>). If the reference model PSIS-LOO-CV Pareto-\(\hat{k}\)
+(<code><a href="https://paulbuerkner.com/brms/reference/reloo.brmsfit.html" class="external-link">brms::reloo()</a></code>). If the reference model PSIS-LOO CV Pareto-\(\hat{k}\)
 values are good, but there are high Pareto-\(\hat{k}\) values for the
 projected models, you can try increasing the number of draws used for the
-PSIS-LOO-CV (<code>ndraws</code> in case of <code>refit_prj = FALSE</code>; <code>ndraws_pred</code> in case
+PSIS-LOO CV (<code>ndraws</code> in case of <code>refit_prj = FALSE</code>; <code>ndraws_pred</code> in case
 of <code>refit_prj = TRUE</code>). If increasing the number of draws does not help and
-if the reference model PSIS-LOO-CV Pareto-\(\hat{k}\) values are high,
-and the reference model PSIS-LOO-CV results change substantially when using
+if the reference model PSIS-LOO CV Pareto-\(\hat{k}\) values are high,
+and the reference model PSIS-LOO CV results change substantially when using
 moment-matching, mixture importance sampling, or <code>reloo</code>-ing, we recommend
-to use \(K\)-fold-CV within <code>projpred</code>.</p>
-<p>For PSIS-LOO-CV, <span class="pkg">projpred</span> calls <code><a href="https://mc-stan.org/loo/reference/psis.html" class="external-link">loo::psis()</a></code> (or, exceptionally,
+to use \(K\)-fold CV within <code>projpred</code>.</p>
+<p>For PSIS-LOO CV, <span class="pkg">projpred</span> calls <code><a href="https://mc-stan.org/loo/reference/psis.html" class="external-link">loo::psis()</a></code> (or, exceptionally,
 <code><a href="https://mc-stan.org/loo/reference/sis.html" class="external-link">loo::sis()</a></code>, see below) with <code>r_eff = NA</code>. This is only a problem if there
 was extreme autocorrelation between the MCMC iterations when the reference
 model was built. In those cases however, the reference model should not
@@ -477,7 +477,7 @@ be a problem.</p>
 such cases, <span class="pkg">projpred</span> resorts to standard importance sampling (SIS)
 and shows a message about this. Throughout the documentation, the term
 "PSIS" is used even though in fact, <span class="pkg">projpred</span> resorts to SIS in these
-special cases. If SIS is used, check that the reference model PSIS-LOO-CV
+special cases. If SIS is used, check that the reference model PSIS-LOO CV
 Pareto-\(\hat{k}\) values are good.</p>
 <p>With <code>parallel = TRUE</code>, costly parts of <span class="pkg">projpred</span>'s CV can be run in
 parallel. Costly parts are the fold-wise searches and performance

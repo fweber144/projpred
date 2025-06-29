@@ -130,7 +130,7 @@
       <h1 data-toc-skip>Latent projection predictive feature
 selection</h1>
             
-            <h4 data-toc-skip class="date">2025-06-25</h4>
+            <h4 data-toc-skip class="date">2025-06-29</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/projpred/blob/HEAD/vignettes/latent.Rmd" class="external-link"><code>vignettes/latent.Rmd</code></a></small>
       <div class="hidden name"><code>latent.Rmd</code></div>
@@ -145,21 +145,24 @@ selection</h1>
 <p>This vignette shows how to use the latent projection predictive
 feature selection from <span class="citation">Catalina, Bürkner, and
 Vehtari (<a href="#ref-catalina_latent_2021">2021</a>)</span> in
-<strong>projpred</strong>. We recommend to read the main vignette first,
-as the latent-projection vignette presented here will skip some of the
-details explained in the main vignette.</p>
+<strong>projpred</strong>. We recommend to read the <a href="https://mc-stan.org/projpred/articles/projpred.html">main
+vignette</a> first, as the latent-projection vignette presented here
+will skip some of the details explained in the main vignette.</p>
 <div class="section level3">
 <h3 id="general-idea">General idea<a class="anchor" aria-label="anchor" href="#general-idea"></a>
 </h3>
 <p>The response families used in GLMs <span class="citation">(<a href="#ref-mccullagh_generalized_1989">McCullagh and Nelder 1989, chap.
-2</a>)</span> (and in GLMMs, GAMs, and GAMMs) may be termed
+2</a>)</span>, GLMMs, GAMs, and GAMMs (in particular, the
+<code><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian()</a></code>, the <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial()</a></code>, and the
+<code><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson()</a></code> family which are supported by
+<strong>projpred</strong>’s traditional projection) may be termed
 <em>exponential dispersion (ED)</em> families <span class="citation">(<a href="#ref-jorgensen_exponential_1987">Jørgensen 1987</a>)</span><a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. For a
 response family that is not an ED family, the Kullback-Leibler (KL)
 divergence minimization problem <span class="citation">(see <a href="#ref-piironen_projective_2020">Piironen, Paasiniemi, and Vehtari
-2020</a>)</span> is often not easy to solve analytically<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>. In order to bypass
-this issue, the latent projection <span class="citation">(<a href="#ref-catalina_latent_2021">Catalina, Bürkner, and Vehtari
+2020</a>)</span> is often not easy to solve analytically. In order to
+bypass this issue, the latent projection <span class="citation">(<a href="#ref-catalina_latent_2021">Catalina, Bürkner, and Vehtari
 2021</a>)</span> solves the KL minimization problem in the predictive
-space of the latent predictors<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> instead of in the predictive space of the
+space of the latent predictors<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> instead of in the predictive space of the
 original response values.</p>
 <p>To this end, the latent predictor is assumed to have a Gaussian
 distribution, since it (i) constitutes a combination of predictor data
@@ -184,10 +187,10 @@ beneficial for families supported by it.</p>
 <div class="section level3">
 <h3 id="impl">Implementation<a class="anchor" aria-label="anchor" href="#impl"></a>
 </h3>
-<p>To use the latent projection in <strong>projpred</strong>, the new
-argument <code>latent</code> of <code><a href="../reference/extend_family.html">extend_family()</a></code> needs to be
-set to <code>TRUE</code>. Since <code><a href="../reference/extend_family.html">extend_family()</a></code> is called
-by <code><a href="../reference/refmodel-init-get.html">init_refmodel()</a></code> which in turn is called by
+<p>To use the latent projection in <strong>projpred</strong>, argument
+<code>latent</code> of <code><a href="../reference/extend_family.html">extend_family()</a></code> needs to be set to
+<code>TRUE</code>. Since <code><a href="../reference/extend_family.html">extend_family()</a></code> is called by
+<code><a href="../reference/refmodel-init-get.html">init_refmodel()</a></code> which in turn is called by
 <code><a href="../reference/refmodel-init-get.html">get_refmodel()</a></code> (more precisely, by the
 <code><a href="../reference/refmodel-init-get.html">get_refmodel()</a></code> methods) which in turn is called at the
 beginning of the top-level functions <code><a href="../reference/project.html">project()</a></code>,
@@ -196,20 +199,20 @@ pass <code>latent = TRUE</code> from such a top-level function down to
 <code><a href="../reference/extend_family.html">extend_family()</a></code> via the ellipsis (<code>...</code>).
 However, for the latent projection, we recommend to define the reference
 model object of class <code>refmodel</code> explicitly (as illustrated
-in the examples below) to avoid repetitions<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>.</p>
+in the examples below) to avoid repetitive and inefficient code<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>.</p>
 <p>After performing the projection (either as a stand-alone feature via
 <code><a href="../reference/project.html">project()</a></code> or embedded in a variable selection via
 <code><a href="../reference/varsel.html">varsel()</a></code> or <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>), the post-processing
 (e.g., the calculation of the performance statistics in
 <code><a href="../reference/summary.vsel.html">summary.vsel()</a></code>) can be performed on the original response
-scale. For this, <code><a href="../reference/extend_family.html">extend_family()</a></code> has gained several new
-arguments accepting R functions responsible for the inverse-link
-transformation from latent scale to response scale
+scale. For this, there are three arguments of
+<code><a href="../reference/extend_family.html">extend_family()</a></code> which accept R functions responsible for
+the inverse-link transformation from latent scale to response scale
 (<code>latent_ilink</code>), for the calculation of log-likelihood
 values on response scale (<code>latent_ll_oscale</code>), and for
 drawing from the (posterior-projection) predictive distribution on
 response scale (<code>latent_ppd_oscale</code>). For some families,
-these arguments have internal defaults implemented natively in
+these three arguments have internal defaults implemented natively in
 <strong>projpred</strong>. These families are listed in the main
 vignette (section <a href="https://mc-stan.org/projpred/articles/projpred.html#modtypes">“Supported
 types of models”</a>). For all other families, <strong>projpred</strong>
@@ -217,28 +220,27 @@ either tries to infer a reasonable function internally (in case of
 <code>latent_ilink</code>) or uses a dummy function returning only
 <code>NA</code>s (in case of <code>latent_ll_oscale</code> and
 <code>latent_ppd_oscale</code>), unless the user supplies custom
-functions to these arguments. When creating a reference model object for
-a family of the latter category (i.e., lacking full response-scale
-support by default), <strong>projpred</strong> will throw messages
-stating whether (and which) features will be unavailable unless at least
-some of these arguments are provided by the user. Again, the ellipsis
+functions. When creating a reference model object for a family of the
+latter category (i.e., lacking full response-scale support by default),
+<strong>projpred</strong> will throw messages stating whether (and
+which) features will be unavailable unless at least some of these
+arguments are provided by the user. Again, the ellipsis
 (<code>...</code>) can be used to pass these arguments from a top-level
 function such as <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> down to
 <code><a href="../reference/extend_family.html">extend_family()</a></code>. In the post-processing functions,
-response-scale analyses can usually be deactivated by setting the new
-argument <code>resp_oscale</code> to <code>FALSE</code>, with the
-exception of <code><a href="../reference/predict.refmodel.html">predict.refmodel()</a></code> and
-<code><a href="../reference/pred-projection.html">proj_linpred()</a></code> where the existing arguments
-<code>type</code> and <code>transform</code> serve this purpose (see the
-documentation).</p>
+response-scale analyses can usually be deactivated by setting argument
+<code>resp_oscale</code> to <code>FALSE</code>, with the exception of
+<code><a href="../reference/predict.refmodel.html">predict.refmodel()</a></code> and <code><a href="../reference/pred-projection.html">proj_linpred()</a></code> where
+arguments <code>type</code> and <code>transform</code> serve this
+purpose (see the documentation).</p>
 <p>Apart from the arguments mentioned above,
-<code><a href="../reference/extend_family.html">extend_family()</a></code> has also gained a new argument
-<code>latent_y_unqs</code> whose purpose is described in the
+<code><a href="../reference/extend_family.html">extend_family()</a></code> also features the latent-projection
+argument <code>latent_y_unqs</code> whose purpose is described in the
 documentation.</p>
 <p>While the latent projection is an approximate solution to the KL
-divergence minimization problem in the original response space<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>, the
-augmented-data projection <span class="citation">(<a href="#ref-weber_projection_2024">Weber, Glass, and Vehtari
-2024</a>)</span> gives the exact<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> solution for some non-ED families, namely
+divergence minimization problem in the original response space<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>, the
+augmented-data projection <span class="citation">(<a href="#ref-weber_projection_2025">Weber, Glass, and Vehtari
+2025</a>)</span> gives the exact<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> solution for some non-ED families, namely
 those where the response distribution has finite support. However, the
 augmented-data projection comes with a higher runtime than the latent
 projection. The families supported by <strong>projpred</strong>’s
@@ -252,8 +254,8 @@ types of models”</a>).</p>
 </h2>
 <p>In this example, we will illustrate that in case of a family
 supported by <strong>projpred</strong>’s traditional projection (here
-the Poisson distribution), the latent projection can improve runtime and
-results of the variable selection compared to
+the <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson()</a></code> family), the latent projection can improve
+runtime and results of the variable selection compared to
 <strong>projpred</strong>’s traditional projection, at least if the L1
 search is used (see argument <code>method</code> of
 <code><a href="../reference/varsel.html">varsel()</a></code> and <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>).</p>
@@ -352,6 +354,9 @@ though the dataset was simulated):</p>
 <pre><code>Warning: Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
 Running the chains for more iterations may help. See
 https://mc-stan.org/misc/warnings.html#bulk-ess</code></pre>
+<p>Due to the technical reasons for which we reduced <code>chains</code>
+and <code>iter</code> in this vignette, we ignore the bulk-ESS warning
+here.</p>
 </div>
 <div class="section level3">
 <h3 id="variable-selection-using-the-latent-projection">Variable selection using the latent projection<a class="anchor" aria-label="anchor" href="#variable-selection-using-the-latent-projection"></a>
@@ -401,126 +406,53 @@ projection’s later:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">time_lat</span><span class="op">)</span></span></code></pre></div>
 <pre><code>   user  system elapsed 
-  0.932   0.062   0.995 </code></pre>
+  2.003   0.128   2.141 </code></pre>
 <p>The message telling that <code>&lt;refmodel&gt;$dis</code> consists
 of only <code>NA</code>s will not concern us here because we will only
 be focusing on response-scale post-processing.</p>
 <p>In order to decide for a submodel size, we first inspect the
-<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> results:</p>
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> results. In contrast to the main vignette where we
+used the mean log predictive density (MLPD) as predictive performance
+statistic for a <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian()</a></code> family reference model (and
+<code><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian()</a></code> submodels), we have a discrete family
+(<code><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson()</a></code>) here, so it makes sense to exponentiate the
+MLPD to obtain the geometric mean predictive density (GMPD; in case of a
+discrete response, the predictive density values are actually predictive
+<em>probabilities</em> and hence the GMPD is bounded by 0 and 1). As in
+the main vignette, we plot with <code>deltas = TRUE</code> (in case of
+the GMPD, this means that the <em>ratio</em> of the submodel GMPD
+vs. the reference model GMPD is shown). Via global option
+<code>projpred.plot_vsel_size_position</code>, we set argument
+<code>size_position</code> of <code><a href="../reference/plot.vsel.html">plot.vsel()</a></code> to
+<code>"secondary_x"</code> to make the submodel sizes readable in all of
+the plots in this vignette.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">(</span> <span class="va">gg_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vs_lat</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, deltas <span class="op">=</span> <span class="st">"mixed"</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>projpred.plot_vsel_size_position <span class="op">=</span> <span class="st">"secondary_x"</span><span class="op">)</span></span>
+<span><span class="op">(</span> <span class="va">gg_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vs_lat</span>, stats <span class="op">=</span> <span class="st">"gmpd"</span>, deltas <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
 <p><img src="latent_files/figure-html/plot_vsel_lat-1.png" width="90%" style="display: block; margin: auto;"></p>
-<p>Although the submodels’ MLPDs seem to be very close to the reference
-model’s MLPD from a submodel size of 6 on, a zoomed plot reveals that
-there is still some discrepancy at sizes 6 to 11 and that size 12 would
-be a better choice (further down below in the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>
-output, we will also see that on absolute scale, the discrepancy at
-sizes 6 to 11 is not negligible):</p>
+<p>Based on this plot, we decide for a submodel size of 11:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gg_lat</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="latent_files/figure-html/plot_vsel_lat_zoom-1.png" width="90%" style="display: block; margin: auto;"></p>
-<p>Thus, we decide for a submodel size of 12:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">size_decided_lat</span> <span class="op">&lt;-</span> <span class="fl">12</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">size_decided_lat</span> <span class="op">&lt;-</span> <span class="fl">11</span></span></code></pre></div>
 <p>This is also the size that <code><a href="../reference/suggest_size.html">suggest_size()</a></code> would
 suggest:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/suggest_size.html">suggest_size</a></span><span class="op">(</span><span class="va">vs_lat</span>, stat <span class="op">=</span> <span class="st">"mlpd"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/suggest_size.html">suggest_size</a></span><span class="op">(</span><span class="va">vs_lat</span>, stat <span class="op">=</span> <span class="st">"gmpd"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>[1] 11</code></pre>
-<p>To obtain the results from the <code><a href="../reference/varsel.html">varsel()</a></code> run in tabular
-form, we call <code><a href="../reference/summary.vsel.html">summary.vsel()</a></code>:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">smmry_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">vs_lat</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>,</span>
-<span>                     type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"lower"</span>, <span class="st">"upper"</span>, <span class="st">"diff"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">smmry_lat</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<pre><code>------
-Response-scale family:
-
-Family: poisson 
-Link function: log 
-
-------
-Latent-scale family:
-
-Family: gaussian 
-Link function: identity 
-
-------
-Formula: .y ~ x.1 + x.2 + x.3 + x.4 + x.5 + x.6 + x.7 + x.8 + x.9 + x.10 + 
-    xcat + xn.1 + xn.2 + xn.3 + xn.4 + xn.5 + xn.6 + xn.7 + xn.8 + 
-    xn.9 + xn.10 + xn.11 + xn.12 + xn.13 + xn.14 + xn.15 + xn.16 + 
-    xn.17 + xn.18 + xn.19 + xn.20 + xn.21 + xn.22 + xn.23 + xn.24 + 
-    xn.25 + xn.26 + xn.27 + xn.28 + xn.29 + xn.30 + xn.31 + xn.32 + 
-    xn.33 + xn.34 + xn.35 + xn.36 + xn.37 + xn.38 + xn.39
-Observations (training set): 71
-Observations (test set): 71
-Projection method: latent
-Search method: L1
-Maximum submodel size for the search: 14
-Number of projected draws in the search: 1 (from clustered projection)
-Number of projected draws in the performance evaluation: 20 (from clustered projection)
-Argument `refit_prj`: TRUE
-
-Submodel performance evaluation summary (response scale) with `deltas = FALSE` and `cumulate = FALSE`:
- size ranking_fulldata cv_proportions_diag    mlpd mlpd.lower mlpd.upper
-    0      (Intercept)                  NA -6294.4    -9093.1    -3495.8
-    1              x.4                  NA -4202.8    -6073.3    -2332.2
-    2              x.6                  NA -1344.9    -1865.8     -824.1
-    3             x.10                  NA  -408.9     -588.9     -228.9
-    4              x.3                  NA  -387.8     -592.5     -183.0
-    5              x.1                  NA  -123.6     -189.6      -57.6
-    6              x.2                  NA   -46.6      -67.0      -26.3
-    7              x.8                  NA   -91.1     -134.2      -48.0
-    8              x.7                  NA   -91.7     -143.1      -40.3
-    9             xcat                  NA   -19.2      -30.7       -7.7
-   10              x.5                  NA    -8.5      -13.5       -3.5
-   11              x.9                  NA    -2.9       -3.1       -2.6
-   12             xn.6                  NA    -2.9       -3.2       -2.6
-   13            xn.19                  NA    -2.9       -3.2       -2.6
-   14            xn.14                  NA    -2.9       -3.2       -2.6
- mlpd.diff
-  -6291.35
-  -4199.69
-  -1341.85
-   -405.80
-   -384.68
-   -120.55
-    -43.53
-    -88.01
-    -88.60
-    -16.10
-     -5.43
-      0.22
-      0.21
-      0.18
-      0.15
-
-Reference model performance evaluation summary (response scale) with `deltas = FALSE`:
-      mlpd mlpd.lower mlpd.upper 
-      -3.1       -3.4       -2.8 </code></pre>
-<p>On absolute scale (column <code>mlpd</code>), we see that submodel
-size 11 leads to an MLPD of <code>-2.9</code>, i.e., a geometric mean
-predictive density (GMPD; due to the discrete response family, the
-“density” values are probabilities here, so we will report the GMPD as
-percentage) of <code>exp(-2.9)</code> which is ca. 5.5023 % whereas size
-12 leads to a GMPD of ca. 5.5 %. This is a considerable improvement from
-size 11 to size 12, so another justification for size 12. (Size 13 would
-have resulted in about the same GMPD as size 12.)</p>
-<p>In the predictor ranking up to the selected size of 12, we can see
-that apart from the noise term <code>xn.6</code>,
-<strong>projpred</strong> has correctly selected the truly relevant
-predictors first and only then the noise predictors. We can see this
-more clearly using the following code:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<p>In the predictor ranking up to the selected size of 11, we can see
+that <strong>projpred</strong> has correctly selected the truly relevant
+predictors first and only then the noise predictors:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rk_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ranking.html">ranking</a></span><span class="op">(</span><span class="va">vs_lat</span><span class="op">)</span></span>
 <span><span class="op">(</span> <span class="va">predictors_final_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">rk_lat</span><span class="op">[[</span><span class="st">"fulldata"</span><span class="op">]</span><span class="op">]</span>, <span class="va">size_decided_lat</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
 <pre><code> [1] "x.4"  "x.6"  "x.10" "x.3"  "x.1"  "x.2"  "x.8"  "x.7"  "xcat" "x.5" 
-[11] "x.9"  "xn.6"</code></pre>
+[11] "x.9" </code></pre>
 <p>We will skip post-selection inference here (see the main vignette for
 a demonstration of post-selection inference), but note that
-<code><a href="../reference/pred-projection.html">proj_predict()</a></code> has gained a new argument
-<code>resp_oscale</code> and that analogous response-scale functionality
-is available in <code><a href="../reference/pred-projection.html">proj_linpred()</a></code> (argument
+<code><a href="../reference/pred-projection.html">proj_predict()</a></code> has argument <code>resp_oscale</code> for
+controlling whether to draw from the posterior-projection predictive
+distributions on the original response scale (<code>TRUE</code>, the
+default) or on latent scale (<code>FALSE</code>) and that analogous
+functionality is available in <code><a href="../reference/pred-projection.html">proj_linpred()</a></code> (argument
 <code>transform</code>) and <code><a href="../reference/predict.refmodel.html">predict.refmodel()</a></code> (argument
 <code>type</code>).</p>
 </div>
@@ -528,8 +460,10 @@ is available in <code><a href="../reference/pred-projection.html">proj_linpred()
 <h3 id="variable-selection-using-the-traditional-projection">Variable selection using the traditional projection<a class="anchor" aria-label="anchor" href="#variable-selection-using-the-traditional-projection"></a>
 </h3>
 <p>We will now look at what <strong>projpred</strong>’s traditional
-projection would have given:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+projection would have given. For this, we increase
+<code>nterms_max</code> because this will reveal an issue with this
+approach:</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_test_trad_poiss</span> <span class="op">&lt;-</span> <span class="va">d_test_lat_poiss</span></span>
 <span><span class="va">d_test_trad_poiss</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">d_test_trad_poiss</span><span class="op">$</span><span class="va">y_oscale</span></span>
 <span><span class="va">d_test_trad_poiss</span><span class="op">$</span><span class="va">y_oscale</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
@@ -543,7 +477,7 @@ projection would have given:</p>
 <span>  <span class="co">### Only for the sake of speed (not recommended in general):</span></span>
 <span>  nclusters_pred <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  <span class="co">###</span></span>
-<span>  nterms_max <span class="op">=</span> <span class="fl">14</span>,</span>
+<span>  nterms_max <span class="op">=</span> <span class="fl">30</span>,</span>
 <span>  <span class="co">### In interactive use, we recommend not to deactivate the verbose mode:</span></span>
 <span>  verbose <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  <span class="co">###</span></span>
@@ -551,106 +485,89 @@ projection would have given:</p>
 <span>  seed <span class="op">=</span> <span class="fl">95930</span></span>
 <span>  <span class="co">###</span></span>
 <span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">time_trad</span><span class="op">)</span></span></code></pre></div>
 <pre><code>   user  system elapsed 
-  1.427   0.000   1.428 </code></pre>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">(</span> <span class="va">gg_trad</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vs_trad</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, deltas <span class="op">=</span> <span class="st">"mixed"</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
-<p><img src="latent_files/figure-html/post_vs_trad-1.png" width="90%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">smmry_trad</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">vs_trad</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>,</span>
-<span>                      type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"lower"</span>, <span class="st">"upper"</span>, <span class="st">"diff"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">smmry_trad</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<pre><code>
-Family: poisson 
-Link function: log 
-
-Formula: y ~ x.1 + x.2 + x.3 + x.4 + x.5 + x.6 + x.7 + x.8 + x.9 + x.10 + 
-    xcat + xn.1 + xn.2 + xn.3 + xn.4 + xn.5 + xn.6 + xn.7 + xn.8 + 
-    xn.9 + xn.10 + xn.11 + xn.12 + xn.13 + xn.14 + xn.15 + xn.16 + 
-    xn.17 + xn.18 + xn.19 + xn.20 + xn.21 + xn.22 + xn.23 + xn.24 + 
-    xn.25 + xn.26 + xn.27 + xn.28 + xn.29 + xn.30 + xn.31 + xn.32 + 
-    xn.33 + xn.34 + xn.35 + xn.36 + xn.37 + xn.38 + xn.39
-Observations (training set): 71
-Observations (test set): 71
-Projection method: traditional
-Search method: L1
-Maximum submodel size for the search: 14
-Number of projected draws in the search: 1 (from clustered projection)
-Number of projected draws in the performance evaluation: 20 (from clustered projection)
-Argument `refit_prj`: TRUE
-
-Submodel performance evaluation summary with `deltas = FALSE` and `cumulate = FALSE`:
- size ranking_fulldata cv_proportions_diag  mlpd mlpd.lower mlpd.upper
-    0      (Intercept)                  NA -3470      -5063      -1876
-    1              x.6                  NA -2546      -3615      -1478
-    2            xn.12                  NA -3559      -5225      -1893
-    3             xcat                  NA -3771      -5547      -1996
-    4              x.4                  NA -2431      -3557      -1304
-    5             x.10                  NA  -954      -1439       -469
-    6              x.3                  NA  -812      -1326       -299
-    7            xn.11                  NA  -677      -1110       -244
-    8             xn.2                  NA -1313      -2082       -543
-    9            xn.22                  NA -1203      -1916       -491
-   10              x.2                  NA  -732      -1122       -343
-   11              x.1                  NA  -102       -136        -68
-   12            xn.23                  NA   -83       -118        -49
-   13            xn.16                  NA  -122       -188        -56
-   14              x.8                  NA   -97       -144        -51
- mlpd.diff
-     -3467
-     -2543
-     -3556
-     -3768
-     -2428
-      -951
-      -809
-      -674
-     -1310
-     -1200
-      -729
-       -99
-       -80
-      -119
-       -94
-
-Reference model performance evaluation summary with `deltas = FALSE`:
-      mlpd mlpd.lower mlpd.upper 
-      -3.1       -3.4       -2.8 </code></pre>
-<p>As these results show, the traditional projection takes longer than
-the latent projection, although the difference is rather small on
-absolute scale (which is due to the fact that the L1 search is already
-quite fast). More importantly however, the predictive performance plot
-is much more unstable and the predictor ranking contains several noise
-terms before truly relevant ones.</p>
+  7.751   0.003   7.759 </code></pre>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="op">(</span> <span class="va">gg_trad</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vs_trad</span>, stats <span class="op">=</span> <span class="st">"gmpd"</span>, deltas <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
+<p><img src="latent_files/figure-html/post_vs_trad-1.png" width="90%" style="display: block; margin: auto;">
+As these results show, the traditional projection takes longer than the
+latent projection, although the difference is rather small on absolute
+scale (which is due to the fact that the L1 search is already quite
+fast). More importantly however, the predictor ranking contains several
+noise terms before truly relevant ones.</p>
 </div>
 <div class="section level3">
 <h3 id="conclusion">Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
 </h3>
-<p>In conclusion, this example showed that the latent projection can be
-advantageous also for families supported by <strong>projpred</strong>’s
-traditional projection by improving the runtime and the stability of the
-variable selection, eventually also leading to better variable selection
-results.</p>
+<p>This example showed that the latent projection can be advantageous
+also for families supported by <strong>projpred</strong>’s traditional
+projection by improving the runtime as well as the results of the
+variable selection.</p>
+<!-- **Forward search START:** -->
+<!-- ```{r} -->
+<!-- time_lat_fw <- system.time(vs_lat_fw <- varsel( -->
+<!--   refm_poiss, -->
+<!--   d_test = d_test_lat_poiss, -->
+<!--   ### Only for demonstrating an issue with the traditional projection in the -->
+<!--   ### next step (not recommended in general): -->
+<!--   # method = "L1", -->
+<!--   ### -->
+<!--   ### Only for the sake of speed (not recommended in general): -->
+<!--   nclusters_pred = 20, -->
+<!--   ### -->
+<!--   nterms_max = 14, -->
+<!--   ### In interactive use, we recommend not to deactivate the verbose mode: -->
+<!--   verbose = 0, -->
+<!--   ### -->
+<!--   ### For comparability with varsel() based on the traditional projection: -->
+<!--   seed = 95930 -->
+<!--   ### -->
+<!-- )) -->
+<!-- print(time_lat_fw) -->
+<!-- ( gg_lat_fw <- plot(vs_lat_fw, stats = "gmpd", deltas = TRUE) ) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- time_trad_fw <- system.time(vs_trad_fw <- varsel( -->
+<!--     refm_fit_poiss, -->
+<!--     d_test = d_test_trad_poiss, -->
+<!--     ### Only for demonstrating an issue with the traditional projection (not -->
+<!--     ### recommended in general): -->
+<!--     # method = "L1", -->
+<!--     ### -->
+<!--     ### Only for the sake of speed (not recommended in general): -->
+<!--     nclusters_pred = 20, -->
+<!--     ### -->
+<!--     nterms_max = 30, -->
+<!--     ### In interactive use, we recommend not to deactivate the verbose mode: -->
+<!--     verbose = 0, -->
+<!--     ### -->
+<!--     ### For comparability with varsel() based on the latent projection: -->
+<!--     seed = 95930 -->
+<!--     ### -->
+<!-- )) -->
+<!-- print(time_trad_fw) -->
+<!-- ( gg_trad_fw <- plot(vs_trad_fw, stats = "gmpd", deltas = TRUE) ) -->
+<!-- ``` -->
+<!-- **Forward search END** -->
 <p>An important point is that we have used the L1 search here. In case
 of the latent projection, a forward search would have given only
-slightly different results (in particular, a slightly smoother
-predictive performance plot). However, in case of the traditional
+slightly different results. However, in case of the traditional
 projection, a forward search would have given markedly better results
-(in particular, the predictive performance plot would have been much
-smoother and all of the noise terms would have been selected after the
-truly relevant ones). Thus, the conclusions made for the L1 search here
-cannot be transmitted easily to the forward search.</p>
+(in particular, all of the noise terms would have been selected after
+the truly relevant ones). Thus, the conclusions made for the L1 search
+here cannot be transmitted easily to the forward search.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="negbinex">Example: Negative binomial distribution<a class="anchor" aria-label="anchor" href="#negbinex"></a>
 </h2>
 <p>In this example, we will illustrate the latent projection in case of
-the negative binomial family (more precisely, we are using
-<code><a href="https://mc-stan.org/rstanarm/reference/neg_binomial_2.html" class="external-link">rstanarm::neg_binomial_2()</a></code> here) which is a family that is
-not supported by <strong>projpred</strong>’s traditional projection<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>.</p>
+the negative binomial family (more precisely, we will use the
+<code><a href="https://mc-stan.org/rstanarm/reference/neg_binomial_2.html" class="external-link">rstanarm::neg_binomial_2()</a></code> family here) which is a family
+that is not supported by <strong>projpred</strong>’s traditional
+projection<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a>.</p>
 <div class="section level3">
 <h3 id="data-1">Data<a class="anchor" aria-label="anchor" href="#data-1"></a>
 </h3>
@@ -662,11 +579,11 @@ not supported by <strong>projpred</strong>’s traditional projection<a href="#f
 <p>We now fit a reference model with the negative binomial distribution
 as response family. For the sake of simplicity, we won’t adjust
 <code>tau0</code> to this new family, but in a real-world example, such
-an adjustment would be necessary. However, since Table 1 of <span class="citation">Piironen and Vehtari (<a href="#ref-piironen_sparsity_2017">2017</a>)</span> doesn’t list the
+an adjustment would be necessary. However, since Table 1 of <span class="citation">Piironen and Vehtari (<a href="#ref-piironen_sparsity_2017">2017</a>)</span> does not list the
 negative binomial distribution, this would first require a manual
 derivation of the pseudo-variance
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mover><mi>σ</mi><mo accent="true">̃</mo></mover><mn>2</mn></msup><annotation encoding="application/x-tex">\tilde{\sigma}^2</annotation></semantics></math>.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">refm_fit_nebin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html" class="external-link">stan_glm</a></span><span class="op">(</span></span>
 <span>  formula <span class="op">=</span> <span class="va">refm_fml</span>,</span>
 <span>  family <span class="op">=</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/neg_binomial_2.html" class="external-link">neg_binomial_2</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -680,6 +597,9 @@ derivation of the pseudo-variance
 <pre><code>Warning: Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
 Running the chains for more iterations may help. See
 https://mc-stan.org/misc/warnings.html#bulk-ess</code></pre>
+<p>Again, we ignore the bulk-ESS warning due to the technical reasons
+for which we reduced <code>chains</code> and <code>iter</code> in this
+vignette.</p>
 </div>
 <div class="section level3">
 <h3 id="variable-selection-using-the-latent-projection-1">Variable selection using the latent projection<a class="anchor" aria-label="anchor" href="#variable-selection-using-the-latent-projection-1"></a>
@@ -687,8 +607,8 @@ https://mc-stan.org/misc/warnings.html#bulk-ess</code></pre>
 <p>To request the latent projection with <code>latent = TRUE</code>, we
 now need to specify more arguments (<code>latent_ll_oscale</code> and
 <code>latent_ppd_oscale</code>) which will be passed to
-<code><a href="../reference/extend_family.html">extend_family()</a></code><a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>:</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code><a href="../reference/extend_family.html">extend_family()</a></code><a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>:</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">refm_prec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">refm_fit_nebin</span><span class="op">)</span><span class="op">[</span>, <span class="st">"reciprocal_dispersion"</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span></span>
 <span><span class="va">latent_ll_oscale_nebin</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ilpreds</span>,</span>
 <span>                                   <span class="va">dis</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">ilpreds</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -722,7 +642,7 @@ now need to specify more arguments (<code>latent_ll_oscale</code> and
 <span>                           latent_ppd_oscale <span class="op">=</span> <span class="va">latent_ppd_oscale_nebin</span><span class="op">)</span></span></code></pre></div>
 <pre><code>Defining `latent_ilink` as a function which calls `family$linkinv`, but there is no guarantee that this will work for all families. If relying on `family$linkinv` is not appropriate or if this raises an error in downstream functions, supply a custom `latent_ilink` function (which is also allowed to return only `NA`s if response-scale post-processing is not needed).</code></pre>
 <pre><code>Since `&lt;refmodel&gt;$dis` will consist of only `NA`s, downstream analyses based on this reference model object won't be able to use log predictive density (LPD) values on latent scale. Furthermore, proj_predict() won't be able to draw from the latent Gaussian distribution.</code></pre>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vs_nebin</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/varsel.html">varsel</a></span><span class="op">(</span></span>
 <span>  <span class="va">refm_nebin</span>,</span>
 <span>  d_test <span class="op">=</span> <span class="va">d_test_lat_poiss</span>,</span>
@@ -737,111 +657,32 @@ now need to specify more arguments (<code>latent_ll_oscale</code> and
 <span><span class="op">)</span></span></code></pre></div>
 <p>Again, the message telling that <code>&lt;refmodel&gt;$dis</code>
 consists of only <code>NA</code>s will not concern us here because we
-will only be focusing on response-scale post-processing. The message
+will only focus on response-scale post-processing. The message
 concerning <code>latent_ilink</code> can be safely ignored here (the
 internal default based on <code>family$linkinv</code> works correctly in
 this case).</p>
 <p>Again, we first inspect the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> results to decide for
 a submodel size:</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">(</span> <span class="va">gg_nebin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vs_nebin</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, deltas <span class="op">=</span> <span class="st">"mixed"</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="op">(</span> <span class="va">gg_nebin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vs_nebin</span>, stats <span class="op">=</span> <span class="st">"gmpd"</span>, deltas <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
 <p><img src="latent_files/figure-html/plot_vsel_nebin-1.png" width="90%" style="display: block; margin: auto;"></p>
-<p>Again, a zoomed plot is more helpful:</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gg_nebin</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">0.25</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="latent_files/figure-html/plot_vsel_nebin_zoom-1.png" width="90%" style="display: block; margin: auto;"></p>
-<p>Although the submodels’ MLPDs approach the reference model’s already
-from a submodel size of 9 on (taking into account the uncertainty bars),
-the curve levels off only from a submodel size of 11 on. For a more
-informed decision, the GMPD could be taken into account again, but for
-the sake of brevity, we will simply decide for a submodel size of 11
-here:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<p>For the decision of the final submodel size, we act as if we
+preferred accuracy over sparsity in their trade-off mentioned in the <a href="https://mc-stan.org/projpred/articles/projpred.html#decision-size">main
+vignette</a>, so we decide for a submodel size of 11:</p>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">size_decided_nebin</span> <span class="op">&lt;-</span> <span class="fl">11</span></span></code></pre></div>
 <p>This is not the size that <code><a href="../reference/suggest_size.html">suggest_size()</a></code> would suggest,
 but as mentioned in the main vignette and in the documentation,
 <code><a href="../reference/suggest_size.html">suggest_size()</a></code> provides only a quite heuristic decision (so
 we stick with our manual decision here):</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/suggest_size.html">suggest_size</a></span><span class="op">(</span><span class="va">vs_nebin</span>, stat <span class="op">=</span> <span class="st">"mlpd"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/suggest_size.html">suggest_size</a></span><span class="op">(</span><span class="va">vs_nebin</span>, stat <span class="op">=</span> <span class="st">"gmpd"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>[1] 10</code></pre>
-<p>Again, we call <code><a href="../reference/summary.vsel.html">summary.vsel()</a></code> to obtain the results from
-the <code><a href="../reference/varsel.html">varsel()</a></code> run in tabular form:</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">smmry_nebin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">vs_nebin</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>,</span>
-<span>                       type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"lower"</span>, <span class="st">"upper"</span>, <span class="st">"diff"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">smmry_nebin</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<pre><code>------
-Response-scale family:
-
-Family: neg_binomial_2 
-Link function: log 
-
-------
-Latent-scale family:
-
-Family: gaussian 
-Link function: identity 
-
-------
-Formula: .y ~ x.1 + x.2 + x.3 + x.4 + x.5 + x.6 + x.7 + x.8 + x.9 + x.10 + 
-    xcat + xn.1 + xn.2 + xn.3 + xn.4 + xn.5 + xn.6 + xn.7 + xn.8 + 
-    xn.9 + xn.10 + xn.11 + xn.12 + xn.13 + xn.14 + xn.15 + xn.16 + 
-    xn.17 + xn.18 + xn.19 + xn.20 + xn.21 + xn.22 + xn.23 + xn.24 + 
-    xn.25 + xn.26 + xn.27 + xn.28 + xn.29 + xn.30 + xn.31 + xn.32 + 
-    xn.33 + xn.34 + xn.35 + xn.36 + xn.37 + xn.38 + xn.39
-Observations (training set): 71
-Observations (test set): 71
-Projection method: latent
-Search method: L1
-Maximum submodel size for the search: 14
-Number of projected draws in the search: 1 (from clustered projection)
-Number of projected draws in the performance evaluation: 20 (from clustered projection)
-Argument `refit_prj`: TRUE
-
-Submodel performance evaluation summary (response scale) with `deltas = FALSE` and `cumulate = FALSE`:
- size ranking_fulldata cv_proportions_diag   mlpd mlpd.lower mlpd.upper
-    0      (Intercept)                  NA -433.9     -611.1     -256.7
-    1              x.4                  NA -107.2     -140.4      -74.1
-    2              x.6                  NA  -21.0      -27.9      -14.2
-    3             x.10                  NA   -8.4       -9.6       -7.2
-    4              x.3                  NA   -5.6       -6.2       -4.9
-    5              x.1                  NA   -4.5       -5.1       -4.0
-    6              x.2                  NA   -4.1       -4.5       -3.6
-    7              x.8                  NA   -3.8       -4.2       -3.4
-    8            xn.29                  NA   -3.8       -4.2       -3.4
-    9              x.7                  NA   -3.7       -4.1       -3.3
-   10             xcat                  NA   -3.5       -3.9       -3.2
-   11              x.5                  NA   -3.4       -3.8       -3.1
-   12             xn.6                  NA   -3.4       -3.8       -3.1
-   13            xn.26                  NA   -3.4       -3.8       -3.1
-   14             xn.4                  NA   -3.4       -3.8       -3.1
- mlpd.diff
-  -430.274
-  -103.649
-   -17.457
-    -4.860
-    -1.977
-    -0.932
-    -0.489
-    -0.266
-    -0.248
-    -0.101
-     0.062
-     0.161
-     0.160
-     0.153
-     0.152
-
-Reference model performance evaluation summary (response scale) with `deltas = FALSE`:
-      mlpd mlpd.lower mlpd.upper 
-      -3.6       -3.9       -3.2 </code></pre>
-<p>As we can see from the predictor ranking included in the plot and in
-the summary table, our selected 11 predictor terms lack one truly
-relevant predictor (<code>x.9</code>) and include one noise term
-(<code>xn.29</code>). More explicitly, our selected predictor terms
-are:</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<p>As we can see from the predictor ranking included in the plot, our
+selected 11 predictor terms lack one truly relevant predictor
+(<code>x.9</code>) and include one noise term (<code>xn.29</code>). More
+explicitly, our selected predictor terms are:</p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rk_nebin</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ranking.html">ranking</a></span><span class="op">(</span><span class="va">vs_nebin</span><span class="op">)</span></span>
 <span><span class="op">(</span> <span class="va">predictors_final_nebin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">rk_nebin</span><span class="op">[[</span><span class="st">"fulldata"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>                                 <span class="va">size_decided_nebin</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
@@ -856,10 +697,8 @@ vignette for a demonstration of post-selection inference).</p>
 <p>This example demonstrated how the latent projection can be used for
 those families which are neither supported by
 <strong>projpred</strong>’s traditional nor by
-<strong>projpred</strong>’s augmented-data projection. (In the future,
-this vignette will be extended to demonstrate how both, latent and
-augmented-data projection, can be applied to those non-ED families which
-are supported by both.)</p>
+<strong>projpred</strong>’s augmented-data projection, which reflects
+the flexibility of the latent approach.</p>
 </div>
 </div>
 <div class="section level2 unnumbered">
@@ -896,10 +735,10 @@ Piironen, Juho, and Aki Vehtari. 2017. <span>“Sparsity Information and
 Regularization in the Horseshoe and Other Shrinkage Priors.”</span>
 <em>Electronic Journal of Statistics</em> 11 (2): 5018–51. <a href="https://doi.org/10.1214/17-EJS1337SI" class="external-link">https://doi.org/10.1214/17-EJS1337SI</a>.
 </div>
-<div id="ref-weber_projection_2024" class="csl-entry">
-Weber, Frank, Änne Glass, and Aki Vehtari. 2024. <span>“Projection
+<div id="ref-weber_projection_2025" class="csl-entry">
+Weber, Frank, Änne Glass, and Aki Vehtari. 2025. <span>“Projection
 Predictive Variable Selection for Discrete Response Families with Finite
-Support.”</span> <em>Computational Statistics</em>. <a href="https://doi.org/10.1007/s00180-024-01506-0" class="external-link">https://doi.org/10.1007/s00180-024-01506-0</a>.
+Support.”</span> <em>Computational Statistics</em> 40 (2): 701–21. <a href="https://doi.org/10.1007/s00180-024-01506-0" class="external-link">https://doi.org/10.1007/s00180-024-01506-0</a>.
 </div>
 </div>
 </div>
@@ -912,41 +751,30 @@ that article mentions the term “ED [i.e., exponential dispersion]
 family”. <span class="citation">Jørgensen (<a href="#ref-jorgensen_exponential_1987">1987</a>)</span> also introduces
 the class of <em>discrete exponential dispersion</em> families (here
 abbreviated by “DED families”), see section <a href="#negbinex">“Example: Negative binomial distribution”</a>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p>The set of families supported by
-<strong>projpred</strong>’s traditional—i.e., neither augmented-data nor
-latent—projection is only a subset of the set of all ED families
-(<strong>projpred</strong>’s traditional projection supports the
-<code><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian()</a></code> family, the <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial()</a></code> family, the
-<code><a href="https://paulbuerkner.com/brms/reference/brmsfamily.html" class="external-link">brms::bernoulli()</a></code> family via
-<code><a href="https://paulbuerkner.com/brms/reference/get_refmodel.brmsfit.html" class="external-link">brms::get_refmodel.brmsfit()</a></code>, and the
-<code><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson()</a></code> family). Thus, we cannot use the term “ED
-families” equivalently to the term “families supported by
-<strong>projpred</strong>’s traditional projection”, but the concept of
-ED families is important here nonetheless.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="fn3"><p>The latent predictors are also known as the linear
-predictors, but “latent” is a more general term than “linear”.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
-<li id="fn4"><p>If the <code>refmodel</code>-class object is not defined
+<li id="fn2"><p>The latent predictors are also known as the linear
+predictors, but “latent” is a more general term than “linear”.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>If the <code>refmodel</code>-class object is not defined
 explicitly but implicitly by a call to a top-level function such as
 <code><a href="../reference/project.html">project()</a></code>, <code><a href="../reference/varsel.html">varsel()</a></code>, or
 <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>, then <code>latent = TRUE</code> and all other
 arguments related to the latent projection need to be set in
-<em>each</em> call to a top-level function.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
-<li id="fn5"><p>More precisely, the latent projection <em>replaces</em>
+<em>each</em> call to a top-level function.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>More precisely, the latent projection <em>replaces</em>
 the KL divergence minimization problem in the original response space by
 a KL divergence minimization problem in the latent space and solves the
-latter.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
-<li id="fn6"><p>Here, “exact” means apart from approximations and
+latter.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>Here, “exact” means apart from approximations and
 simplifications which are also undertaken for the traditional
-projection.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
-<li id="fn7"><p>The negative binomial distribution belongs to the class
+projection.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn6"><p>The negative binomial distribution belongs to the class
 of <em>discrete exponential dispersion</em> families <span class="citation">(<a href="#ref-jorgensen_exponential_1987">Jørgensen
 1987</a>)</span> (here abbreviated by “DED families”). DED families are
 closely related to ED families <span class="citation">(<a href="#ref-jorgensen_exponential_1987">Jørgensen 1987</a>)</span>, but
 strictly speaking, the class of DED families is not a subset of the
 class of ED families. GitHub issue <a href="https://github.com/stan-dev/projpred/issues/361" class="external-link">#361</a> explains
 why the “traditional” projection onto a DED-family submodel is currently
-not implemented in <strong>projpred</strong>.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
-<li id="fn8"><p>The suffix <code>_prec</code> in <code>refm_prec</code>
+not implemented in <strong>projpred</strong>.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
+<li id="fn7"><p>The suffix <code>_prec</code> in <code>refm_prec</code>
 stands for “precision” because here, we follow the Stan convention (see
 the Stan documentation for the <code>neg_binomial_2</code> distribution,
 the <code><a href="https://paulbuerkner.com/brms/reference/brmsfamily.html" class="external-link">brms::negbinomial()</a></code> documentation, and the <a href="https://paulbuerkner.com/brms/" class="external-link"><strong>brms</strong></a> vignette
@@ -957,16 +785,14 @@ there (confusingly, argument <code>size</code> in
 <code><a href="https://rdrr.io/r/stats/NegBinomial.html" class="external-link">?stats::NegBinomial</a></code>—which is the same as
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϕ</mi><annotation encoding="application/x-tex">\phi</annotation></semantics></math>
 from the Stan notation—is called the <em>dispersion</em> parameter
-there, although the variance is increased by its reciprocal).<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
+there, although the variance is increased by its reciprocal).<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
