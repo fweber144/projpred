@@ -139,6 +139,7 @@
 <li>For the CV parallelization (see argument <code>parallel</code> of <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>), a new global option <code>projpred.export_to_workers</code> may be set to a character vector of names of objects to export from the global environment to the parallel workers. (GitHub: <a href="https://github.com/stan-dev/projpred/issues/497" class="external-link">#497</a>, <a href="https://github.com/stan-dev/projpred/issues/510" class="external-link">#510</a>)</li>
 <li>Added global options <code>projpred.foreach_errorhandling</code> and <code>projpred.foreach_verbose</code> whose values are passed to <code><a href="https://rdrr.io/pkg/foreach/man/foreach.html" class="external-link">foreach::foreach()</a></code>’s arguments <code>.errorhandling</code> and <code>.verbose</code>, respectively. The defaults for these new global options are the same as those for the respective <code><a href="https://rdrr.io/pkg/foreach/man/foreach.html" class="external-link">foreach::foreach()</a></code> arguments: <code>"stop"</code> for global option <code>projpred.foreach_errorhandling</code> and <code>FALSE</code> for global option <code>projpred.foreach_verbose</code>. (GitHub: commit 3231d13)</li>
 <li>Added global options to control several arguments of <code><a href="../reference/plot.vsel.html">plot.vsel()</a></code> and <code><a href="../reference/plot.cv_proportions.html">plot.cv_proportions()</a></code> (see section “Usage” of the help pages of these two functions). (GitHub: commit 3333043)</li>
+<li>Changed the maintainer to Osvaldo Martin.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-2-9-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-9-0"></a></h3>
@@ -665,7 +666,7 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Juho Piironen, Markus Paasiniemi, Alejandro Catalina, Frank Weber, Aki Vehtari.</p>
+  <p></p><p>Developed by Juho Piironen, Markus Paasiniemi, Alejandro Catalina, Frank Weber, Osvaldo Martin, Aki Vehtari.</p>
 </div>
 
 <div class="pkgdown">
