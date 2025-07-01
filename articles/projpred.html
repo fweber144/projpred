@@ -130,7 +130,7 @@
       <h1 data-toc-skip>projpred: Projection predictive feature
 selection</h1>
             
-            <h4 data-toc-skip class="date">2025-06-30</h4>
+            <h4 data-toc-skip class="date">2025-07-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/projpred/blob/HEAD/vignettes/projpred.Rmd" class="external-link"><code>vignettes/projpred.Rmd</code></a></small>
       <div class="hidden name"><code>projpred.Rmd</code></div>
@@ -155,8 +155,11 @@ inference.</p>
 implemented in <strong>projpred</strong> are described in detail in
 <span class="citation">Piironen, Paasiniemi, and Vehtari (<a href="#ref-piironen_projective_2020">2020</a>)</span>, <span class="citation">Catalina, Bürkner, and Vehtari (<a href="#ref-catalina_projection_2022">2022</a>)</span>, <span class="citation">Weber, Glass, and Vehtari (<a href="#ref-weber_projection_2025">2025</a>)</span>, and <span class="citation">Catalina, Bürkner, and Vehtari (<a href="#ref-catalina_latent_2021">2021</a>)</span>. A comparison to many
 other methods may also be found in <span class="citation">Piironen and
-Vehtari (<a href="#ref-piironen_comparison_2017">2017a</a>)</span>. For
-details on how to cite <strong>projpred</strong>, see the <a href="https://CRAN.R-project.org/package=projpred/citation.html" class="external-link">projpred
+Vehtari (<a href="#ref-piironen_comparison_2017">2017a</a>)</span>. An
+introduction to the theory behind <strong>projpred</strong>, a workflow
+for practitioners, and further insights into the theory (and practice)
+of projection predictive inference are presented by <span class="citation">McLatchie et al. (<a href="#ref-mclatchie_advances_2025">2025</a>)</span>. For details on how
+to cite <strong>projpred</strong>, see the <a href="https://CRAN.R-project.org/package=projpred/citation.html" class="external-link">projpred
 citation info</a> on CRAN<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>.</p>
 </div>
 <div class="section level2">
@@ -204,7 +207,7 @@ procedure—which does not have to be the same as the reference model’s
 <code>formula</code> at all). Such “custom” reference model objects can
 be constructed via <code><a href="../reference/refmodel-init-get.html">init_refmodel()</a></code> (or
 <code><a href="../reference/refmodel-init-get.html">get_refmodel.default()</a></code>), as shown in section “Examples” of
-the <code><a href="../reference/refmodel-init-get.html">?init_refmodel</a></code> help<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>.</p>
+the <code><a href="../reference/refmodel-init-get.html">?init_refmodel</a></code> help.</p>
 <p>Here, we use the <strong>rstanarm</strong> package to fit the
 reference model. If you want to use the <strong>brms</strong> package,
 simply replace the <strong>rstanarm</strong> fit (of class
@@ -244,7 +247,7 @@ build faster, we use only 2 MCMC chains and 1000 iterations per chain
 (with half of them being discarded as warmup draws). In practice, 4
 chains and 2000 iterations per chain are reasonable defaults.
 Furthermore, we make use of <a href="https://mc-stan.org/rstan/" class="external-link"><strong>rstan</strong></a>’s
-parallelization, which means to run each chain on a separate CPU core<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>. If you
+parallelization, which means to run each chain on a separate CPU core<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>. If you
 run the following code yourself, you can either rely on an automatic
 mechanism to detect the number of CPU cores (like the
 <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">parallel::detectCores()</a></code> function shown below) or adapt
@@ -284,7 +287,7 @@ the technical reasons for which we reduced <code>chains</code> and
 <p>From the reference model fit (called <code>refm_fit</code> here), we
 create a reference model object (i.e., an object of class
 <code>refmodel</code>) since this avoids redundant calculations in the
-remainder of this vignette<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>:</p>
+remainder of this vignette<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">refm_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/refmodel-init-get.html">get_refmodel</a></span><span class="op">(</span><span class="va">refm_fit</span><span class="op">)</span></span></code></pre></div>
 <p>In <strong>projpred</strong>, the projection predictive variable
@@ -309,8 +312,8 @@ argument <code>validate_search</code>: If
 run with the training data of each CV fold separately and the evaluation
 part is run with the corresponding test data of each CV fold. If
 <code>validate_search = FALSE</code>, the search is excluded from the CV
-so that only a single full-data search is run. Because of its most
-thorough protection against overfitting<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>,
+so that only a single full-data search is run. Because of its more
+thorough protection against overfitting<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>,
 <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with <code>validate_search = TRUE</code> is
 recommended over <code><a href="../reference/varsel.html">varsel()</a></code> and <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with
 <code>validate_search = FALSE</code>. Nonetheless, a preliminary and
@@ -362,24 +365,22 @@ its global option, just like argument <code>text_angle</code>):</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>projpred.plot_vsel_text_angle <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvvs_fast</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, ranking_nterms_max <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></code></pre></div>
 <p><img src="projpred_files/figure-html/plot_vsel_fast-1.png" width="90%" style="display: block; margin: auto;">
-This plot suggests that the submodel MLPD levels off for the first time
-from submodel size 8 to 9 and that it increases only slightly
-afterwards. However, we used L1 search with
-<code>refit_prj = FALSE</code>, which means that the projections
-employed for the predictive performance evaluation are L1-penalized,
-which is usually undesired <span class="citation">(<a href="#ref-piironen_projective_2020">Piironen, Paasiniemi, and Vehtari
-2020, sec. 4</a>)</span>. Thus, to investigate the impact of
-<code>refit_prj = FALSE</code>, we re-run <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>, but
-this time with the default of <code>refit_prj = TRUE</code> and re-using
-the search results (as well as the CV-related arguments such as
-<code>validate_search</code>; see section “Usage” in
-<code><a href="../reference/cv_varsel.html">?cv_varsel.vsel</a></code>) from the former <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>
-call (this is done by applying <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> to
-<code>cvvs_fast</code> instead of <code>refm_obj</code> so that the
-<code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> generic dispatches to the
-<code><a href="../reference/cv_varsel.html">cv_varsel.vsel()</a></code> method that was introduced in
-<strong>projpred</strong> 2.8.0<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a>). To save time, we also set
-<code>nclusters_pred</code> to a comparatively low value of
+This plot suggests that the submodel MLPD levels off from submodel size
+8 on. However, we used L1 search with <code>refit_prj = FALSE</code>,
+which means that the projections employed for the predictive performance
+evaluation are L1-penalized, which is usually undesired <span class="citation">(<a href="#ref-piironen_projective_2020">Piironen,
+Paasiniemi, and Vehtari 2020, sec. 4</a>)</span>. Thus, to investigate
+the impact of <code>refit_prj = FALSE</code>, we re-run
+<code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>, but this time with the default of
+<code>refit_prj = TRUE</code> and re-using the search results (as well
+as the CV-related arguments such as <code>validate_search</code>; see
+section “Usage” in <code><a href="../reference/cv_varsel.html">?cv_varsel.vsel</a></code>) from the former
+<code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> call (this is done by applying
+<code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> to <code>cvvs_fast</code> instead of
+<code>refm_obj</code> so that the <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> generic
+dispatches to the <code><a href="../reference/cv_varsel.html">cv_varsel.vsel()</a></code> method that was
+introduced in <strong>projpred</strong> 2.8.0<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>). To save time, we
+also set <code>nclusters_pred</code> to a comparatively low value of
 <code>20</code>:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Preliminary cv_varsel() run with `refit_prj = TRUE`:</span></span>
@@ -401,7 +402,7 @@ performance plot from above now looks as follows:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvvs_fast_refit</span>, stats <span class="op">=</span> <span class="st">"mlpd"</span>, ranking_nterms_max <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></code></pre></div>
 <p><img src="projpred_files/figure-html/plot_vsel_fast_refit-1.png" width="90%" style="display: block; margin: auto;">
-This refined plot shows that the submodel MLPD does not change much
+This refined plot confirms that the submodel MLPD does not change much
 after submodel size 8, so in our final <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> run, we
 set <code>nterms_max</code> to a value slightly higher than 8 (here: 9)
 to ensure that we see the MLPD leveling off. The search results from the
@@ -481,8 +482,8 @@ match this scale, but argument <code>deltas</code> of
 <code><a href="../reference/plot.vsel.html">plot.vsel()</a></code> offers two more options:</p>
 <ul>
 <li>With <code>deltas = TRUE</code>, the performance statistics are
-plotted on <em>difference scale</em>, i.e., as differences<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a> from the baseline
-model<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>
+plotted on <em>difference scale</em>, i.e., as differences<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> from the baseline
+model<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>
 and the uncertainty bars match this scale,</li>
 <li>With <code>deltas = "mixed"</code>, the performance statistics
 (i.e., their point estimates) are plotted on the actual scale, but the
@@ -511,13 +512,13 @@ red horizontal line).</p>
 <p>Sometimes, the plot may be ambiguous because after reaching the
 reference model’s performance, the submodels’ performance may keep
 increasing (and hence become even better than the reference model’s
-performance<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a>). In that case, one has to find a suitable
+performance<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>). In that case, one has to find a suitable
 trade-off between predictive performance (accuracy) and model size
 (sparsity) in the context of subject-matter knowledge.</p>
 <p>Here, we decide for a submodel size of 7 because it seems to provide
 the best trade-off between sparsity and accuracy (size 7 is the smallest
-size where the submodel MLPD is close enough to the reference model
-MLPD).</p>
+size where the submodel MLPD is close enough to the reference model MLPD
+and from size 7 on, the submodel MLPD levels off).</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">size_decided</span> <span class="op">&lt;-</span> <span class="fl">7</span></span></code></pre></div>
 <p>In section <a href="#rksel">“Predictor ranking(s) from final
@@ -533,8 +534,8 @@ caution (see <code><a href="../reference/suggest_size.html">?suggest_size</a></c
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/suggest_size.html">suggest_size</a></span><span class="op">(</span><span class="va">cvvs</span>, stat <span class="op">=</span> <span class="st">"mlpd"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>[1] 7</code></pre>
-<p>With this heuristic, we would get the same final submodel size
-(<code>7</code>) as with our manual decision.</p>
+<p>In this case, that heuristic gives the same final submodel size
+(<code>7</code>) as our manual decision.</p>
 </div>
 <div class="section level4">
 <h4 id="predictive-performance-table-from-final-cv_varsel-run">Predictive performance table from final <code>cv_varsel()</code>
@@ -741,7 +742,7 @@ with a considerable increase in predictive performance.</p>
 <p>The <code><a href="../reference/project.html">project()</a></code> function returns an object of class
 <code>projection</code> which forms the basis for convenient
 post-selection inference. By the following <code><a href="../reference/project.html">project()</a></code> call,
-we project the reference model onto the final submodel once again<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a>:
+we project the reference model onto the final submodel once again<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a>:
 <!-- In versions > 2.0.2, **projpred** offers a parallelization of the projection. -->
 <!-- Typically, this only makes sense for a large number of projected draws. -->
 <!-- Therefore, this parallelization is not activated by a simple logical switch, but by a threshold for the number of projected draws below which no parallelization will be used. -->
@@ -777,7 +778,7 @@ used like any matrix of draws from MCMC procedures, except that it
 doesn’t reflect a typical posterior distribution, but rather a projected
 posterior distribution, i.e., the distribution arising from the
 deterministic projection of the reference model’s posterior distribution
-onto the parameter space of the final submodel<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a>. Beware that in case
+onto the parameter space of the final submodel<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a>. Beware that in case
 of clustered projection (i.e., a non-<code>NULL</code> argument
 <code>nclusters</code> in the <code><a href="../reference/project.html">project()</a></code> call), the
 projected draws have different (i.e., nonconstant) weights, which needs
@@ -786,7 +787,7 @@ generally, post-projection) inference, see
 <code><a href="../reference/as_draws_matrix.projection.html">as_draws_matrix.projection()</a></code> (<code><a href="../reference/pred-projection.html">proj_linpred()</a></code>
 and <code><a href="../reference/pred-projection.html">proj_predict()</a></code> offer similar functionality via
 arguments <code>return_draws_matrix</code> and
-<code>nresample_clusters</code>, respectively<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a>).</p>
+<code>nresample_clusters</code>, respectively<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a>).</p>
 <div class="section level3">
 <h3 id="marginals-of-the-projected-posterior">Marginals of the projected posterior<a class="anchor" aria-label="anchor" href="#marginals-of-the-projected-posterior"></a>
 </h3>
@@ -860,7 +861,7 @@ have the following new observations:</p>
 2  0   0  0   0  0  0  0
 3  1   1  1   1  1  1  1</code></pre>
 <p>Then <code><a href="../reference/pred-projection.html">proj_linpred()</a></code> can calculate the linear
-predictors<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a> for all new observations from
+predictors<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a> for all new observations from
 <code>dat_gauss_new</code>. Depending on argument
 <code>integrated</code>, these linear predictors can be averaged across
 the projected draws (within each new observation). For instance, the
@@ -888,7 +889,7 @@ distributions based on the final submodel. In contrast to
 <code>proj_linpred(&lt;...&gt;, integrated = FALSE)</code>, this
 encompasses not only the uncertainty arising from parameter estimation,
 but also the uncertainty arising from the observation (or “sampling”)
-model for the response<a href="#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a>. This is useful for what is usually
+model for the response<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a>. This is useful for what is usually
 termed a posterior predictive check (PPC), but would have to be termed
 something like a posterior-projection predictive check (PPPC) here:</p>
 <div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
@@ -919,13 +920,13 @@ projection type is neither “augmented-data” nor “latent” (see below for
 a description of these).</p>
 <p>Apart from the <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian()</a></code> response family used in this
 vignette, <strong>projpred</strong>’s traditional projection also
-supports the <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial()</a></code><a href="#fn15" class="footnote-ref" id="fnref15"><sup>15</sup></a> and the <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson()</a></code>
+supports the <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial()</a></code><a href="#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a> and the <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson()</a></code>
 family.</p>
-<p>The families supported by <strong>projpred</strong>’s augmented-data
-projection <span class="citation">(<a href="#ref-weber_projection_2025">Weber, Glass, and Vehtari
-2025</a>)</span> are <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial()</a></code><a href="#fn16" class="footnote-ref" id="fnref16"><sup>16</sup></a> <a href="#fn17" class="footnote-ref" id="fnref17"><sup>17</sup></a>,
+<p>The families currently supported by <strong>projpred</strong>’s
+augmented-data projection <span class="citation">(<a href="#ref-weber_projection_2025">Weber, Glass, and Vehtari
+2025</a>)</span> are <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial()</a></code><a href="#fn15" class="footnote-ref" id="fnref15"><sup>15</sup></a> <a href="#fn16" class="footnote-ref" id="fnref16"><sup>16</sup></a>,
 <code><a href="https://paulbuerkner.com/brms/reference/brmsfamily.html" class="external-link">brms::cumulative()</a></code>, <code><a href="https://mc-stan.org/rstanarm/reference/stan_polr.html" class="external-link">rstanarm::stan_polr()</a></code>
-fits, and <code><a href="https://paulbuerkner.com/brms/reference/brmsfamily.html" class="external-link">brms::categorical()</a></code><a href="#fn18" class="footnote-ref" id="fnref18"><sup>18</sup></a> <a href="#fn19" class="footnote-ref" id="fnref19"><sup>19</sup></a>. See
+fits, and <code><a href="https://paulbuerkner.com/brms/reference/brmsfamily.html" class="external-link">brms::categorical()</a></code><a href="#fn17" class="footnote-ref" id="fnref17"><sup>17</sup></a>. See
 <code><a href="../reference/extend_family.html">?extend_family</a></code> (which is called by
 <code><a href="../reference/refmodel-init-get.html">init_refmodel()</a></code>) for an explanation how to apply the
 augmented-data projection to “custom” reference model objects. For
@@ -951,9 +952,9 @@ families. The latent projection is applied when setting argument
 <code><a href="../reference/refmodel-init-get.html">init_refmodel()</a></code>) to <code>TRUE</code>. The families for
 which full latent-projection functionality (in particular,
 <code>resp_oscale = TRUE</code>, i.e., post-processing on the original
-response scale) is currently available are <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial()</a></code><a href="#fn20" class="footnote-ref" id="fnref20"><sup>20</sup></a> <a href="#fn21" class="footnote-ref" id="fnref21"><sup>21</sup></a>,
+response scale) is currently available are <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial()</a></code><a href="#fn18" class="footnote-ref" id="fnref18"><sup>18</sup></a> <a href="#fn19" class="footnote-ref" id="fnref19"><sup>19</sup></a>,
 <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson()</a></code>, <code><a href="https://paulbuerkner.com/brms/reference/brmsfamily.html" class="external-link">brms::cumulative()</a></code>, and
-<code><a href="https://mc-stan.org/rstanarm/reference/stan_polr.html" class="external-link">rstanarm::stan_polr()</a></code> fits<a href="#fn22" class="footnote-ref" id="fnref22"><sup>22</sup></a>. For all other
+<code><a href="https://mc-stan.org/rstanarm/reference/stan_polr.html" class="external-link">rstanarm::stan_polr()</a></code> fits<a href="#fn20" class="footnote-ref" id="fnref20"><sup>20</sup></a>. For all other
 families, you can try to use the latent projection (by setting
 <code>latent = TRUE</code>) and <strong>projpred</strong> should tell
 you if any features are not available and how to make them available.
@@ -965,8 +966,8 @@ error if a requested feature is currently not supported for the latent
 projection.</p>
 <p>On the side of the predictors, <strong>projpred</strong> not only
 supports linear main effects as shown in this vignette, but also
-interactions, multilevel<a href="#fn23" class="footnote-ref" id="fnref23"><sup>23</sup></a>, and—as an experimental
-feature—additive<a href="#fn24" class="footnote-ref" id="fnref24"><sup>24</sup></a> terms.</p>
+interactions, multilevel<a href="#fn21" class="footnote-ref" id="fnref21"><sup>21</sup></a>, and—as an experimental
+feature—additive<a href="#fn22" class="footnote-ref" id="fnref22"><sup>22</sup></a> terms.</p>
 <p>Transferring this vignette to such more complex problems is
 straightforward (also because this vignette employs a “typical”
 reference model object): Basically, only the code for fitting the
@@ -1051,17 +1052,18 @@ stronger sparsifying prior) should have a similar effect.</li>
 the penalized iteratively reweighted least squares (PIRLS) algorithm
 might have convergence issues <span class="citation">(<a href="#ref-catalina_latent_2021">Catalina, Bürkner, and Vehtari
 2021</a>)</span>. In this case, the latent-space approach by <span class="citation">Catalina, Bürkner, and Vehtari (<a href="#ref-catalina_latent_2021">2021</a>)</span> might help, see also
-the latent-projection vignette linked above.</li>
+the <a href="https://mc-stan.org/projpred/articles/latent.html">latent-projection
+vignette</a>.</li>
 </ol>
 </div>
 <div class="section level3">
 <h3 id="overfitting">Overfitting<a class="anchor" aria-label="anchor" href="#overfitting"></a>
 </h3>
-<p>If you are using <code><a href="../reference/varsel.html">varsel()</a></code>, then the lack of CV in
+<p>If <code><a href="../reference/varsel.html">varsel()</a></code> is used, the lack of a CV in
 <code><a href="../reference/varsel.html">varsel()</a></code> may lead to overconfident and overfitted results.
-In this case, try running <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> instead of
-<code><a href="../reference/varsel.html">varsel()</a></code> (which you should in any case for your final
-results).</p>
+In this case, we recommend <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> instead of
+<code><a href="../reference/varsel.html">varsel()</a></code> (<code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> should be used for final
+results anyway).</p>
 <p>Similarly, <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with
 <code>validate_search = FALSE</code> is more prone to overfitting than
 <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with <code>validate_search = TRUE</code>.</p>
@@ -1071,22 +1073,19 @@ results).</p>
 </h3>
 <p>For multilevel binomial models, the traditional projection may not
 work properly and give suboptimal results, see <a href="https://github.com/stan-dev/projpred/pull/353" class="external-link">#353</a> on GitHub
-(the underlying issue is described in <strong>lme4</strong> issue <a href="https://github.com/lme4/lme4/issues/682" class="external-link">#682</a>). With
-suboptimality of the results, we mean that in such cases, the relevance
-of the group-level terms can be underestimated. According to the
-simulation-based case study from <a href="https://github.com/stan-dev/projpred/pull/353" class="external-link">#353</a>, the
-latent projection should be considered as a currently available
-remedy.</p>
+(the underlying issue is described in <strong>lme4</strong> issue <a href="https://github.com/lme4/lme4/issues/682" class="external-link">#682</a>). By suboptimal
+results, we mean that the relevance of the group-level terms can be
+underestimated. According to the simulation-based case study from <a href="https://github.com/stan-dev/projpred/pull/353" class="external-link">#353</a>, the
+latent projection might help in that case.</p>
 <p>For multilevel Poisson models, the traditional projection may take
 very long, see <a href="https://github.com/stan-dev/projpred/pull/353" class="external-link">#353</a>. According
 to the simulation-based case study from <a href="https://github.com/stan-dev/projpred/pull/353" class="external-link">#353</a>, the
-latent projection should be considered as a currently available
-remedy.</p>
-<p>Finally, as illustrated in the Poisson example of the
-latent-projection vignette, the latent projection can be beneficial for
-non-multilevel models with a (non-Gaussian) family that is also
-supported by the traditional projection, at least in case of the Poisson
-family and L1 search.</p>
+latent projection might help in that case.</p>
+<p>Finally, as illustrated in the <a href="https://mc-stan.org/projpred/articles/latent.html#example-poisson-distribution">Poisson
+example of the latent-projection vignette</a>, the latent projection can
+be beneficial for non-multilevel models with a (non-Gaussian) family
+that is also supported by the traditional projection, at least in case
+of the Poisson family and L1 search.</p>
 </div>
 <div class="section level3">
 <h3 id="issues-with-the-augmented-data-projection">Issues with the augmented-data projection<a class="anchor" aria-label="anchor" href="#issues-with-the-augmented-data-projection"></a>
@@ -1096,24 +1095,23 @@ from the same issue as the traditional projection for the binomial
 family (see above), i.e., it may not work properly and give suboptimal
 results, see <a href="https://github.com/stan-dev/projpred/pull/353" class="external-link">#353</a> (the
 underlying issue is probably similar to the one described in
-<strong>lme4</strong> issue <a href="https://github.com/lme4/lme4/issues/682" class="external-link">#682</a>). With
-suboptimality of the results, we mean that in such cases, the relevance
-of the group-level terms can be underestimated. According to the
-simulation-based case study from <a href="https://github.com/stan-dev/projpred/pull/353" class="external-link">#353</a>, the
-latent projection should be considered as a remedy in such cases.</p>
+<strong>lme4</strong> issue <a href="https://github.com/lme4/lme4/issues/682" class="external-link">#682</a>). By suboptimal
+results, we mean that the relevance of the group-level terms can be
+underestimated. According to the simulation-based case study from <a href="https://github.com/stan-dev/projpred/pull/353" class="external-link">#353</a>, the
+latent projection might help in such cases.</p>
 </div>
 <div class="section level3">
 <h3 id="speed">Speed<a class="anchor" aria-label="anchor" href="#speed"></a>
 </h3>
 <p>There are many ways to speed up <strong>projpred</strong>, but in
 general, such speed-ups lead to results that are less accurate and hence
-should only be considered as <em>preliminary</em> results. Some speed-up
-possibilities are:</p>
+should only be considered as giving <em>preliminary</em> results. Some
+speed-up possibilities are:</p>
 <ol style="list-style-type: decimal">
 <li><p>Using <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with
 <code>validate_search = FALSE</code> instead of
 <code>validate_search = TRUE</code>. In case of
-<code>cv_method = "LOO"</code><a href="#fn25" class="footnote-ref" id="fnref25"><sup>25</sup></a>, <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with
+<code>cv_method = "LOO"</code><a href="#fn23" class="footnote-ref" id="fnref23"><sup>23</sup></a>, <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with
 <code>validate_search = FALSE</code> has comparable runtime to
 <code><a href="../reference/varsel.html">varsel()</a></code>, but accounts for some overfitting, namely that
 induced by <code><a href="../reference/varsel.html">varsel()</a></code>’s in-sample predictions during the
@@ -1121,8 +1119,9 @@ predictive performance evaluation. However, as explained in section <a href="#va
 <code>validate_search = FALSE</code> is more prone to overfitting than
 <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with
 <code>validate_search = TRUE</code>.</p></li>
-<li><p>Using <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with subsampled PSIS-LOO CV, see
-argument <code>nloo</code> of <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>.</p></li>
+<li><p>Using <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with subsampled PSIS-LOO CV <span class="citation">(<a href="#ref-magnusson_leave-one-out_2020">Magnusson
+et al. 2020</a>)</span>, see argument <code>nloo</code> of
+<code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>.</p></li>
 <li><p>Using <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold
 CV instead of PSIS-LOO CV. Whether this provides a speed improvement
@@ -1172,8 +1171,9 @@ search. Note that L1 search implies <code>nclusters = 1</code> and is
 not always supported. In general, forward search is more accurate than
 L1 search and hence more desirable (see section “Details” in
 <code><a href="../reference/varsel.html">?varsel</a></code> or <code><a href="../reference/cv_varsel.html">?cv_varsel</a></code> for a more detailed
-comparison of the two). The issue demonstrated in the Poisson example
-from the latent-projection vignette is related to this.</p></li>
+comparison of the two). The issue demonstrated in the <a href="https://mc-stan.org/projpred/articles/latent.html#example-poisson-distribution">Poisson
+example of the latent-projection vignette</a> is related to
+this.</p></li>
 <li><p>Setting argument <code>refit_prj</code> (of <code><a href="../reference/varsel.html">varsel()</a></code>
 or <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code>) to <code>FALSE</code>, which basically
 means to set <code>ndraws_pred = ndraws</code> and
@@ -1253,6 +1253,20 @@ in Generalised Linear Models: <span>A Bayesian</span> Approach via
 <span>Kullback-Leibler</span> Projections.”</span> <em>Biometrika</em>
 85 (1): 29–37.
 </div>
+<div id="ref-magnusson_leave-one-out_2020" class="csl-entry">
+Magnusson, Måns, Michael Riis Andersen, Johan Jonasson, and Aki Vehtari.
+2020. <span>“Leave-One-Out Cross-Validation for <span>Bayesian</span>
+Model Comparison in Large Data.”</span> In <em>Proceedings of
+<span>The</span> 23rd <span>International Conference</span> on
+<span>Artificial Intelligence</span> and <span>Statistics</span></em>,
+edited by Silvia Chiappa and Roberto Calandra, 108:341–51. Proceedings
+of <span>Machine Learning Research</span>. <span>PMLR</span>. <a href="https://proceedings.mlr.press/v108/magnusson20a.html" class="external-link">https://proceedings.mlr.press/v108/magnusson20a.html</a>.
+</div>
+<div id="ref-mclatchie_advances_2025" class="csl-entry">
+McLatchie, Yann, Sölvi Rögnvaldsson, Frank Weber, and Aki Vehtari. 2025.
+<span>“Advances in Projection Predictive Inference.”</span>
+<em>Statistical Science</em> 40 (1): 128–47. <a href="https://doi.org/10.1214/24-STS949" class="external-link">https://doi.org/10.1214/24-STS949</a>.
+</div>
 <div id="ref-pavone_using_2022" class="csl-entry">
 Pavone, Federico, Juho Piironen, Paul-Christian Bürkner, and Aki
 Vehtari. 2022. <span>“Using Reference Models in Variable
@@ -1306,39 +1320,37 @@ Support.”</span> <em>Computational Statistics</em> 40 (2): 701–21. <a href="
 <li id="fn1"><p>The citation information can be accessed offline by
 typing <code>print(citation("projpred"), bibtex = TRUE)</code> within
 R.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p>We will cover custom reference models more deeply in a
-future vignette.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="fn3"><p>More generally, the number of chains is split up as
-evenly as possible among the number of CPU cores.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
-<li id="fn4"><p>Here, the <code><a href="../reference/refmodel-init-get.html">get_refmodel()</a></code> call is quite
+<li id="fn2"><p>More generally, the number of chains is split up as
+evenly as possible among the number of CPU cores.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Here, the <code><a href="../reference/refmodel-init-get.html">get_refmodel()</a></code> call is quite
 fast, but in other situations, it may take a while, so in general, it is
 better to create the <code>refmodel</code> object once explicitly and
-then to re-use it.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
-<li id="fn5"><p>Currently, neither <code><a href="../reference/varsel.html">varsel()</a></code> nor
+then to re-use it.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>Currently, neither <code><a href="../reference/varsel.html">varsel()</a></code> nor
 <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> (not even <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with
 <code>validate_search = TRUE</code>) guard against overfitting in the
 selection of the submodel <em>size</em>. This is why we added
 “approximately” to “valid post-selection inference” in section <a href="#intro">“Introduction”</a>. Typically, however, the overfitting
 induced by the size selection should be comparatively small <span class="citation">(<a href="#ref-piironen_comparison_2017">Piironen and
-Vehtari 2017a</a>)</span>.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
-<li id="fn6"><p>Analogous functionality has been implemented for
-<code><a href="../reference/varsel.html">varsel()</a></code>, namely in <code><a href="../reference/varsel.html">varsel.vsel()</a></code>.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
-<li id="fn7"><p>For the geometric mean predictive density (GMPD; see
+Vehtari 2017a</a>)</span>.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>Analogous functionality has been implemented for
+<code><a href="../reference/varsel.html">varsel()</a></code>, namely in <code><a href="../reference/varsel.html">varsel.vsel()</a></code>.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn6"><p>For the geometric mean predictive density (GMPD; see
 argument <code>stats</code> of <code><a href="../reference/summary.vsel.html">summary.vsel()</a></code> and
-<code><a href="../reference/plot.vsel.html">plot.vsel()</a></code>), <code>deltas = TRUE</code> plots the GMPD
-<em>ratio</em> (not difference) vs. the baseline model.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
-<li id="fn8"><p>For the definition of the baseline model, see argument
+<code><a href="../reference/plot.vsel.html">plot.vsel()</a></code>), <code>deltas = TRUE</code> estimates the GMPD
+<em>ratio</em> (not difference) vs. the baseline model.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
+<li id="fn7"><p>For the definition of the baseline model, see argument
 <code>baseline</code> of <code><a href="../reference/summary.vsel.html">summary.vsel()</a></code> and
 <code><a href="../reference/plot.vsel.html">plot.vsel()</a></code>; in the most common cases, the default baseline
-model is the reference model.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
-<li id="fn9"><p>In general, only <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with
+model is the reference model.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn8"><p>In general, only <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with
 <code>validate_search = TRUE</code> allows to judge whether the
 submodels perform better than the reference model or not. Such a
 judgment is generally not possible with <code><a href="../reference/varsel.html">varsel()</a></code> or
-<code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with <code>validate_search = FALSE</code>.<a href="#fnref9" class="footnote-back">↩︎</a></p></li>
-<li id="fn10"><p>During the search, the reference model is projected
-onto all candidate models (this is where arguments <code>ndraws</code>
-and <code>nclusters</code> of <code><a href="../reference/varsel.html">varsel()</a></code> and
+<code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> with <code>validate_search = FALSE</code>.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
+<li id="fn9"><p>During the search, the reference model is projected onto
+all candidate models (this is where arguments <code>ndraws</code> and
+<code>nclusters</code> of <code><a href="../reference/varsel.html">varsel()</a></code> and
 <code><a href="../reference/cv_varsel.html">cv_varsel()</a></code> come into play; note that in case of an L1
 search, the projection is L1-penalized). For the evaluation of the
 submodels along the predictor ranking returned by the search, the
@@ -1363,67 +1375,63 @@ here we call <code><a href="../reference/project.html">project()</a></code> with
 accurate results, we could increase argument <code>ndraws</code> of
 <code><a href="../reference/project.html">project()</a></code> (up to the number of posterior draws in the
 reference model). However, this would increase the runtime, which we
-don’t want in this vignette.<a href="#fnref10" class="footnote-back">↩︎</a></p></li>
-<li id="fn11"><p>In general, this implies that projected regression
+don’t want in this vignette.<a href="#fnref9" class="footnote-back">↩︎</a></p></li>
+<li id="fn10"><p>In general, this implies that projected regression
 coefficients do not reflect isolated effects of the predictors. For
 example, especially in case of highly correlated predictors, it is
 possible that projected regression coefficients “absorb” effects from
-predictors that have been excluded in the projection.<a href="#fnref11" class="footnote-back">↩︎</a></p></li>
-<li id="fn12"><p><code><a href="../reference/pred-projection.html">proj_predict()</a></code> also has an argument
+predictors that have been excluded in the projection.<a href="#fnref10" class="footnote-back">↩︎</a></p></li>
+<li id="fn11"><p><code><a href="../reference/pred-projection.html">proj_predict()</a></code> also has an argument
 <code>return_draws_matrix</code>, but it simply converts the return
 value type. In <code><a href="../reference/pred-projection.html">proj_predict()</a></code>, different weights of the
 projected draws are taken into account via argument
-<code>nresample_clusters</code>.<a href="#fnref12" class="footnote-back">↩︎</a></p></li>
-<li id="fn13"><p><code><a href="../reference/pred-projection.html">proj_linpred()</a></code> can also transform the
+<code>nresample_clusters</code>.<a href="#fnref11" class="footnote-back">↩︎</a></p></li>
+<li id="fn12"><p><code><a href="../reference/pred-projection.html">proj_linpred()</a></code> can also transform the
 linear predictor to response scale, but here, this is the same as the
-linear predictor scale (because of the identity link function).<a href="#fnref13" class="footnote-back">↩︎</a></p></li>
-<li id="fn14"><p>In case of the Gaussian family we are using here, the
+linear predictor scale (because of the identity link function).<a href="#fnref12" class="footnote-back">↩︎</a></p></li>
+<li id="fn13"><p>In case of the Gaussian family we are using here, the
 uncertainty arising from the observation model is the uncertainty due to
-the residual standard deviation.<a href="#fnref14" class="footnote-back">↩︎</a></p></li>
-<li id="fn15"><p>Via <code><a href="https://paulbuerkner.com/brms/reference/get_refmodel.brmsfit.html" class="external-link">brms::get_refmodel.brmsfit()</a></code>, the
-<code><a href="https://paulbuerkner.com/brms/reference/brmsfamily.html" class="external-link">brms::bernoulli()</a></code> family is supported as well.<a href="#fnref15" class="footnote-back">↩︎</a></p></li>
-<li id="fn16"><p>Currently, the augmented-data support for the
+the residual standard deviation.<a href="#fnref13" class="footnote-back">↩︎</a></p></li>
+<li id="fn14"><p>Via <code><a href="https://paulbuerkner.com/brms/reference/get_refmodel.brmsfit.html" class="external-link">brms::get_refmodel.brmsfit()</a></code>, the
+<code><a href="https://paulbuerkner.com/brms/reference/brmsfamily.html" class="external-link">brms::bernoulli()</a></code> family is supported as well.<a href="#fnref14" class="footnote-back">↩︎</a></p></li>
+<li id="fn15"><p>Currently, the augmented-data support for the
 <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial()</a></code> family does not include binomial distributions
 with more than one trial. In such a case, a workaround is to
 de-aggregate the Bernoulli trials which belong to the same (aggregated)
-observation, i.e., to use a “long” dataset.<a href="#fnref16" class="footnote-back">↩︎</a></p></li>
-<li id="fn17"><p>Like the traditional projection, the augmented-data
+observation, i.e., to use a “long” dataset.<a href="#fnref15" class="footnote-back">↩︎</a></p></li>
+<li id="fn16"><p>Like the traditional projection, the augmented-data
 projection also supports the <code><a href="https://paulbuerkner.com/brms/reference/brmsfamily.html" class="external-link">brms::bernoulli()</a></code> family via
-<code><a href="https://paulbuerkner.com/brms/reference/get_refmodel.brmsfit.html" class="external-link">brms::get_refmodel.brmsfit()</a></code>.<a href="#fnref17" class="footnote-back">↩︎</a></p></li>
-<li id="fn18"><p>For the augmented-data projection based on a “typical”
+<code><a href="https://paulbuerkner.com/brms/reference/get_refmodel.brmsfit.html" class="external-link">brms::get_refmodel.brmsfit()</a></code>.<a href="#fnref16" class="footnote-back">↩︎</a></p></li>
+<li id="fn17"><p>For the augmented-data projection based on a “typical”
 <strong>brms</strong> reference model object, <strong>brms</strong>
-version 2.17.0 or later is needed.<a href="#fnref18" class="footnote-back">↩︎</a></p></li>
-<li id="fn19"><p>More <strong>brms</strong> families might be supported
-in the future.<a href="#fnref19" class="footnote-back">↩︎</a></p></li>
-<li id="fn20"><p>Currently, the latent-projection support for the
+version 2.17.0 or later is needed.<a href="#fnref17" class="footnote-back">↩︎</a></p></li>
+<li id="fn18"><p>Currently, the latent-projection support for the
 <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial()</a></code> family does not include binomial distributions
 with more than one trial. In such a case, a workaround is to
 de-aggregate the Bernoulli trials which belong to the same (aggregated)
-observation, i.e., to use a “long” dataset.<a href="#fnref20" class="footnote-back">↩︎</a></p></li>
-<li id="fn21"><p>Like the traditional projection, the latent projection
+observation, i.e., to use a “long” dataset.<a href="#fnref18" class="footnote-back">↩︎</a></p></li>
+<li id="fn19"><p>Like the traditional projection, the latent projection
 also supports the <code><a href="https://paulbuerkner.com/brms/reference/brmsfamily.html" class="external-link">brms::bernoulli()</a></code> family via
-<code><a href="https://paulbuerkner.com/brms/reference/get_refmodel.brmsfit.html" class="external-link">brms::get_refmodel.brmsfit()</a></code>.<a href="#fnref21" class="footnote-back">↩︎</a></p></li>
-<li id="fn22"><p>For the latent projection based on a “typical”
+<code><a href="https://paulbuerkner.com/brms/reference/get_refmodel.brmsfit.html" class="external-link">brms::get_refmodel.brmsfit()</a></code>.<a href="#fnref19" class="footnote-back">↩︎</a></p></li>
+<li id="fn20"><p>For the latent projection based on a “typical”
 <strong>brms</strong> reference model object, <strong>brms</strong>
-version 2.19.0 or later is needed.<a href="#fnref22" class="footnote-back">↩︎</a></p></li>
-<li id="fn23"><p>Multilevel models are also known as
+version 2.19.0 or later is needed.<a href="#fnref20" class="footnote-back">↩︎</a></p></li>
+<li id="fn21"><p>Multilevel models are also known as
 <em>hierarchical</em> models or models with <em>partially pooled</em>,
-<em>group-level</em>, or—in frequentist terms—<em>random</em> effects.<a href="#fnref23" class="footnote-back">↩︎</a></p></li>
-<li id="fn24"><p>Additive terms are also known as <em>smooth</em>
-terms.<a href="#fnref24" class="footnote-back">↩︎</a></p></li>
-<li id="fn25"><p>In case of <code>cv_method = "kfold"</code>, the
+<em>group-level</em>, or—in frequentist terms—<em>random</em> effects.<a href="#fnref21" class="footnote-back">↩︎</a></p></li>
+<li id="fn22"><p>Additive terms are also known as <em>smooth</em>
+terms.<a href="#fnref22" class="footnote-back">↩︎</a></p></li>
+<li id="fn23"><p>In case of <code>cv_method = "kfold"</code>, the
 runtime advantage of <code>validate_search = FALSE</code> compared to
 <code>validate_search = TRUE</code> is by far not as large as in case of
-<code>cv_method = "LOO"</code>.<a href="#fnref25" class="footnote-back">↩︎</a></p></li>
+<code>cv_method = "LOO"</code>.<a href="#fnref23" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
