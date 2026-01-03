@@ -1270,11 +1270,17 @@ outdmin_tester_aug <- function(
         sub_formul_no_grp <- update(sub_formul,
                                     . ~ . - (1 | z.1) - (xco.1 | z.1))
         ###
+        resp_coefs_nm <- if (packageVersion("mclogit") >= "0.9.15") {
+          "Logit eqn."
+        } else {
+          "Response categories"
+        }
         expect_identical(
           dimnames(coefs_crr),
-          list("Response categories" = tail(augdat_cats, -1),
-               "Predictors" = colnames(model.matrix(sub_formul_no_grp,
-                                                    data = sub_data))),
+          setNames(list(tail(augdat_cats, -1),
+                        colnames(model.matrix(sub_formul_no_grp,
+                                              data = sub_data))),
+                   c(resp_coefs_nm, "Predictors")),
           info = info_str
         )
 
@@ -1285,7 +1291,21 @@ outdmin_tester_aug <- function(
         expect_named(ranef_crr, NULL, info = info_str)
         expect_true(is.matrix(ranef_crr[[1]]), info = info_str)
         expect_true(is.numeric(ranef_crr[[1]]), info = info_str)
-        if (packageVersion("Matrix") >= "1.5-0") {
+        if (packageVersion("mclogit") >= "0.9.15") {
+          ranef_nms <- apply(
+            expand.grid(resp_val = tail(levels(eval_lhs(sub_formul, dat)), -1),
+                        coef_val = coef_nms,
+                        grpl_val = levels(dat$z.1)),
+            1,
+            function(x_row) {
+              paste0(x_row["resp_val"], "~", x_row["coef_val"], "|",
+                     x_row["grpl_val"])
+            }
+          )
+          expect_identical(dimnames(ranef_crr[[1]]),
+                           list(ranef_nms, NULL),
+                           info = info_str)
+        } else if (packageVersion("Matrix") >= "1.5-0") {
           expect_null(dimnames(ranef_crr[[1]]), info = info_str)
         } else {
           expect_identical(dimnames(ranef_crr[[1]]),
