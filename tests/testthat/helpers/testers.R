@@ -2960,7 +2960,7 @@ plot_vsel_tester <- function(
   expect_identical(attr(plot_vsel, "projpred_ranking_abbreviated"),
                    attr_abbv_expected, info = info_str)
   if (run_snaps) {
-    vdiffr::expect_doppelganger(info_str, plot_vsel)
+    expect_doppelganger_cust(info_str, plot_vsel)
   }
 
   return(invisible(TRUE))

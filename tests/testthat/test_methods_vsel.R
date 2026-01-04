@@ -768,7 +768,7 @@ test_that("plot.ranking() is a shortcut", {
     ))
     expect_s3_class(plotpr_from_rk, c("gg", "ggplot"))
     if (run_snaps) {
-      vdiffr::expect_doppelganger(tstsetup, plotpr_from_rk)
+      expect_doppelganger_cust(tstsetup, plotpr_from_rk)
     }
   }
 })
