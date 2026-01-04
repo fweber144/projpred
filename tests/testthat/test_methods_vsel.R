@@ -752,7 +752,7 @@ test_that("`x` of class `cv_proportions` works", {
   for (tstsetup in names(plotprs)) {
     expect_s3_class(plotprs[[tstsetup]], c("gg", "ggplot"))
     if (run_snaps) {
-      vdiffr::expect_doppelganger(tstsetup, plotprs[[tstsetup]])
+      expect_doppelganger_cust(tstsetup, plotprs[[tstsetup]])
     }
   }
 })
