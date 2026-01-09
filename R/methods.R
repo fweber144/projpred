@@ -1211,15 +1211,15 @@ plot.vsel <- function(
 
 #' Summary of a [varsel()] or [cv_varsel()] run
 #'
-#' This is the [summary()] method for `vsel` objects (returned by [varsel()] or
-#' [cv_varsel()]). Apart from some general information about the [varsel()] or
-#' [cv_varsel()] run, it shows the full-data predictor ranking, basic
-#' information about the (CV) variability in the ranking of the predictors (if
-#' available; inferred from [cv_proportions()]), and estimates for
-#' user-specified predictive performance statistics. For a graphical
-#' representation, see [plot.vsel()]. For extracting the predictive performance
-#' results printed at the bottom of the output created by this [summary()]
-#' method, see [performances()].
+#' This is the [`summary()`][base::summary()] method for `vsel` objects
+#' (returned by [varsel()] or [cv_varsel()]). Apart from some general
+#' information about the [varsel()] or [cv_varsel()] run, it shows the full-data
+#' predictor ranking, basic information about the (CV) variability in the
+#' ranking of the predictors (if available; inferred from [cv_proportions()]),
+#' and estimates for user-specified predictive performance statistics. For a
+#' graphical representation, see [plot.vsel()]. For extracting the predictive
+#' performance results printed at the bottom of the output created by this
+#' [`summary()`][base::summary()] method, see [performances()].
 #'
 #' @param object An object of class `vsel` (returned by [varsel()] or
 #'   [cv_varsel()]).
