@@ -752,7 +752,7 @@ test_that("`x` of class `cv_proportions` works", {
   for (tstsetup in names(plotprs)) {
     expect_s3_class(plotprs[[tstsetup]], c("gg", "ggplot"))
     if (run_snaps) {
-      vdiffr::expect_doppelganger(tstsetup, plotprs[[tstsetup]])
+      expect_doppelganger_cust(tstsetup, plotprs[[tstsetup]])
     }
   }
 })
@@ -768,7 +768,7 @@ test_that("plot.ranking() is a shortcut", {
     ))
     expect_s3_class(plotpr_from_rk, c("gg", "ggplot"))
     if (run_snaps) {
-      vdiffr::expect_doppelganger(tstsetup, plotpr_from_rk)
+      expect_doppelganger_cust(tstsetup, plotpr_from_rk)
     }
   }
 })
