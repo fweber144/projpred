@@ -940,7 +940,7 @@ cvmeth_tst <- list(
 
 nloo_tst <- list(
   default_nloo = list(),
-  subsmpl = list(nloo = as.integer(nobsv %/% 10))
+  subsmpl = list(nloo = as.integer(nobsv %/% 2))
 )
 
 resp_oscale_tst <- list(
