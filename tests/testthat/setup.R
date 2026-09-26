@@ -1331,14 +1331,7 @@ if (run_cvvs) {
     if (args_cvvs_i$mod_nm == "gamm" &&
         !identical(args_cvvs_i$cv_method, "kfold")) {
       # Due to issue #239, we have to wrap the call to cv_varsel() in try():
-      cvvs_res <- try(eval(cvvs_expr), silent = TRUE)
-      if (inherits(cvvs_res, "try-error") &&
-          grepl("singular matrix in 'backsolve'. First zero in diagonal ",
-                attr(cvvs_res, "condition")$message)) {
-        args_cvvs_i$seed <- args_cvvs_i$seed + 2L
-        cvvs_res <- try(eval(cvvs_expr), silent = TRUE)
-      }
-      return(cvvs_res)
+      return(try(eval(cvvs_expr), silent = TRUE))
     } else {
       return(eval(cvvs_expr))
     }
