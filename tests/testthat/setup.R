@@ -229,7 +229,7 @@ thres <- qlogis(seq_len(nthres) / ncat)
 link_str <- "logit"
 
 # Seed:
-seed_dat <- 8541351
+seed_dat <- 1623641
 set.seed(seed_dat)
 
 ## GLMs --------------------------------------------------------------------
